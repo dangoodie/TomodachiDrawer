@@ -208,8 +208,9 @@ public partial class MainWindow : Window
                 {
                     bool hasImage = !string.IsNullOrEmpty(_currentImagePath);
 
-                    // ExportUF2 only needs an image — no RP2040 required
+                    // ExportUF2 / ExportTDLD only need an image - no RP2040 required
                     ExportUF2Button.IsEnabled = hasImage;
+                    ExportTDLDButton.IsEnabled = hasImage && !BusyExporting;
 
                     if (path != null)
                     {
@@ -824,6 +825,89 @@ public partial class MainWindow : Window
         ExportUF2Button.IsEnabled = true;
         BusyExporting = false;
 
+        SetEstimate(totalTime);
+    }
+
+    private async void ExportTDLDButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(_currentImagePath))
+            return;
+
+        if (_currentSettings.SelectedSwitchVersion == SwitchVersion.None)
+        {
+            _ = ShowMessageAsync(
+                "Select Switch Version",
+                "For compatibility, you must select a switch version in the dropdown."
+                    + "\n\nSwitch 1 is more prone to desyncs, so this avoids certain things that are particularly prone to desyncing."
+                    + "\nPlease be aware that even with Switch 1 selected, desyncs are unfortunately expected due to inconsistent and unpredictable lag in the drawing UI."
+            );
+            return;
+        }
+
+        var file = await StorageProvider.SaveFilePickerAsync(
+            new FilePickerSaveOptions
+            {
+                Title = "Save .tdld",
+                DefaultExtension = "tdld",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("TDLD image") { Patterns = ["*.tdld"] },
+                    new FilePickerFileType("All Files") { Patterns = ["*.*"] },
+                ],
+            }
+        );
+
+        var outputPath = file?.TryGetLocalPath();
+        if (outputPath == null)
+            return;
+
+        var imagePath = _currentImagePath;
+        var denoiser = DenoisingComboBox.SelectedItem?.ToString();
+        var tspLimit = (float)(TSPTimeLimitUpDown.Value ?? 0.5m);
+
+        ExportTDLDButton.IsEnabled = false;
+        BusyExporting = true;
+        TimeSpan totalTime = TimeSpan.MaxValue;
+        var settings = GetQuantizerSettings();
+        var enableExperimental = EnableExperimentalCheckBox.IsChecked ?? false;
+        var enableHome = EnableHomeCanvas.IsChecked ?? false;
+
+        await Task.Run(async () =>
+        {
+            // FileControllerSink writes its output directly to disk, so we point
+            // it at the user's chosen path and skip the temp-file + copy dance the
+            // other export buttons do.
+            AppendLog($"Exporting TDLD to {outputPath}");
+            var timingSink = new TimingSink();
+            var drawer = new CanvasDrawer(
+                timingSink,
+                _currentSettings.SelectedSwitchVersion,
+                AppendLog
+            );
+            drawer.ConnectAndConfirmController();
+            AppendLog("Starting to generate inputs...");
+            var drawSettings = new DrawImageSettings()
+            {
+                QuantizerSettings = settings,
+                DenoiserName = denoiser,
+                TSPTimeLimit = tspLimit,
+                DisableLargeBrush = false,
+                EnableExperimentalFeatures = enableExperimental,
+                HomeToTopLeft = enableHome,
+            };
+            await drawer.DrawImage(SKBitmap.Decode(imagePath), drawSettings);
+            AppendLog($"True complete overall time is: {timingSink.TotalTime.TotalSeconds}s");
+
+            var fileSink = new FileControllerSink(outputPath);
+            timingSink.ReplayTo(fileSink);
+            fileSink.Dispose();
+
+            AppendLog($"Saved TDLD to {outputPath}");
+            totalTime = timingSink.TotalTime;
+        });
+
+        ExportTDLDButton.IsEnabled = true;
+        BusyExporting = false;
         SetEstimate(totalTime);
     }
 
