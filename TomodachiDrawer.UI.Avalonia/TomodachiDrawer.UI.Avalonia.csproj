@@ -74,6 +74,21 @@
     <!-- Delete large native pdbs of minimal value -->
     <Delete Files="$(PublishDir)libSkiaSharp.pdb;$(PublishDir)libHarfBuzzSharp.pdb" />
   </Target>
+  <Target Name="CopyESPBundlesToPublish" AfterTargets="Publish">
+    <!-- Force EspTools/ and EspFirmware/ into the publish output, regardless
+         of how MSBuild's None/Content rules interact with PublishSingleFile
+         and PublishTrimmed (they were silently dropping the bundled bins). -->
+    <ItemGroup>
+      <ESPToolsBundle Include="EspTools\**\*" Condition="Exists('EspTools')" />
+      <ESPFirmwareBundle Include="EspFirmware\**\*.bin" Condition="Exists('EspFirmware')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ESPToolsBundle)"
+          DestinationFiles="@(ESPToolsBundle->'$(PublishDir)EspTools\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ESPFirmwareBundle)"
+          DestinationFiles="@(ESPFirmwareBundle->'$(PublishDir)EspFirmware\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
   <!-- macOS .app bundling `-p:BundleMacOSApp=true` -->
   <PropertyGroup Condition="'$(BundleMacOSApp)' == 'true' And $(RuntimeIdentifier.StartsWith('osx'))">
     <SelfContained>true</SelfContained>
