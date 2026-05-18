@@ -35,14 +35,28 @@ jobs:
   build-firmware:
     name: Build ESP32-S3 firmware
     runs-on: ubuntu-latest
+    env:
+      IDF_VERSION: v6.0
     steps:
     - uses: actions/checkout@v6
+    - name: Restore cached ESP-IDF docker image
+      id: idf-docker-cache
+      uses: actions/cache@v4
+      with:
+        path: /tmp/idf-docker-image.tar
+        key: idf-docker-${{ env.IDF_VERSION }}
+    - name: Load ESP-IDF docker image from cache
+      if: steps.idf-docker-cache.outputs.cache-hit == 'true'
+      run: docker load -i /tmp/idf-docker-image.tar
     - name: Build firmware
       uses: espressif/esp-idf-ci-action@v1
       with:
-        esp_idf_version: v5.4
+        esp_idf_version: ${{ env.IDF_VERSION }}
         target: esp32s3
         path: 'TomodachiDrawer.Firmware.ESP32S3'
+    - name: Save ESP-IDF docker image for next run
+      if: steps.idf-docker-cache.outputs.cache-hit != 'true'
+      run: docker save espressif/idf:${{ env.IDF_VERSION }} -o /tmp/idf-docker-image.tar
     - name: Stage firmware artifacts
       run: |
         mkdir firmware_artifacts
