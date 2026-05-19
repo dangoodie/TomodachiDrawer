@@ -60,9 +60,10 @@ typedef uint16_t gamepad_button_t;
 #define STICK_CENTER 128
 
 // The HID descriptor declares 7 bytes per report (16 button bits + 4 hat + 4
-// pad + 4 stick axes). Switch tolerates an extra trailing byte; Windows does
-// not, so we send exactly 7.
-#define HID_REPORT_WIRE_LEN 7
+// pad + 4 stick axes), but Switch firmware appears to require 8 bytes per
+// report for a Pokken-class device - matches what the RP2040 firmware sends
+// and what real HORI Pokken controllers send on the wire.
+#define HID_REPORT_WIRE_LEN 8
 
 // Report layout: [Btn1, Btn2, DPad, LX, LY, RX, RY, Padding]
 static uint8_t current_report[8] = {0x00, 0x00, 0x08, 128, 128, 128, 128, 0x00};
