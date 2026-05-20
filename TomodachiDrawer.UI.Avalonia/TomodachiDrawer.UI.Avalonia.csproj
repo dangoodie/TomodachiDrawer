@@ -37,6 +37,19 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <Link>EspFirmware\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </None>
+    <!-- Repo-root LICENSE + third-party licence index, copied into every
+         publish artifact so end users see our GPLv3 terms and the esptool
+         licence pointer. -->
+    <None Include="..\LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>LICENSE</Link>
+    </None>
+    <None Include="..\THIRD_PARTY_LICENSES.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>THIRD_PARTY_LICENSES.md</Link>
+    </None>
   </ItemGroup>
   <Target Name="CopyESP32S3FirmwareLocal" BeforeTargets="BeforeBuild">
     <!-- If the sibling firmware project has been built locally (idf.py build),
