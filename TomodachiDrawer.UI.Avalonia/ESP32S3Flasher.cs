@@ -231,26 +231,65 @@ internal static class ESP32S3Flasher
         return Encoding.UTF8.GetString(buf, offset, end - offset);
     }
 
-    public static FirmwareLayout? FindBundledFirmware(out string? missingReason)
+    // Supported board variants. Each maps to a sdkconfig.defaults.<Id> file in
+    // the firmware project and a TomodachiDrawer_FW_ESP32S3-<Id>.bin produced
+    // by the build-firmware CI matrix. The bundled firmware bins only differ
+    // per board for the onboard WS2812 LED GPIO - the HID gamepad behavior is
+    // identical. To add a board: extend main/Kconfig.projbuild, add a
+    // sdkconfig.defaults.<id>, add the id to the workflow matrix, and append
+    // an entry here.
+    public record BoardInfo(string Id, string DisplayName, int LedGpio)
+    {
+        // ComboBox renders items via ToString() by default; the auto-record
+        // ToString prints all fields which would look ugly in the dropdown.
+        public override string ToString() => DisplayName;
+    }
+
+    public static readonly IReadOnlyList<BoardInfo> SupportedBoards = new[]
+    {
+        new BoardInfo("devkitc_1_r38",  "ESP32-S3-DevKitC-1 (older rev, LED on GPIO 38)", 38),
+        new BoardInfo("devkitc_1_r48",  "ESP32-S3-DevKitC-1 (later rev, LED on GPIO 48)", 48),
+        new BoardInfo("s3_zero",        "Waveshare ESP32-S3-Zero (LED on GPIO 21)",        21),
+        new BoardInfo("devkitm_1",      "ESP32-S3-DevKitM-1 (LED on GPIO 48)",             48),
+        new BoardInfo("qtpy_s3",        "Adafruit QT Py ESP32-S3 (LED on GPIO 39)",        39),
+        new BoardInfo("lolin_s3_mini",  "Lolin S3 Mini (LED on GPIO 47)",                  47),
+        new BoardInfo("atom_s3",        "M5Stack AtomS3 / AtomS3 Lite (LED on GPIO 35)",   35),
+    };
+
+    public const string DefaultBoardId = "devkitc_1_r38";
+
+    public static FirmwareLayout? FindBundledFirmware(string boardId, out string? missingReason)
     {
         var dir = Path.Combine(AppContext.BaseDirectory, "EspFirmware");
         var boot = Path.Combine(dir, "bootloader.bin");
         var ptab = Path.Combine(dir, "partition-table.bin");
-        var app = Path.Combine(dir, "TomodachiDrawer_FW_ESP32S3.bin");
+        var suffixedAppName = $"TomodachiDrawer_FW_ESP32S3-{boardId}.bin";
+        var suffixedApp = Path.Combine(dir, suffixedAppName);
+
+        // Local-dev fallback: `idf.py build` writes the unsuffixed name. If
+        // we're running against a local build instead of a CI release, accept
+        // it but warn that whichever board is picked must match what was
+        // actually compiled.
+        var unsuffixedApp = Path.Combine(dir, "TomodachiDrawer_FW_ESP32S3.bin");
+        string? appPath = File.Exists(suffixedApp) ? suffixedApp
+                       : File.Exists(unsuffixedApp) ? unsuffixedApp
+                       : null;
+
         var missing = new List<string>();
         if (!File.Exists(boot)) missing.Add("bootloader.bin");
         if (!File.Exists(ptab)) missing.Add("partition-table.bin");
-        if (!File.Exists(app)) missing.Add("TomodachiDrawer_FW_ESP32S3.bin");
+        if (appPath == null) missing.Add(suffixedAppName);
         if (missing.Count == 0)
         {
             missingReason = null;
-            return new FirmwareLayout(boot, ptab, app);
+            return new FirmwareLayout(boot, ptab, appPath!);
         }
         missingReason = $"missing in {dir}: {string.Join(", ", missing)}";
         return null;
     }
 
-    public static FirmwareLayout? FindBundledFirmware() => FindBundledFirmware(out _);
+    public static FirmwareLayout? FindBundledFirmware(string boardId) =>
+        FindBundledFirmware(boardId, out _);
 
     // Flash bootloader + partition table + app in a single esptool call.
     public static async Task<bool> FlashBaseFirmwareAsync(

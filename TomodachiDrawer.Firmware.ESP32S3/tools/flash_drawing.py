@@ -104,13 +104,6 @@ def flash_bytes(tdld_bytes, port, source_label):
         print(f"WARN: {source_label} bytes don't start with 'TDLD' magic "
               f"(first 4 bytes = {tdld_bytes[:4].hex()})", file=sys.stderr)
 
-    # parttool wants a file - drop into the script's folder so we don't pollute
-    # whatever directory the user is in.
-    tmp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "_extracted.tdld")
-    with open(tmp_path, "wb") as f:
-        f.write(tdld_bytes)
-
     parttool = find_parttool()
     if not parttool:
         print("ERROR: could not locate parttool.py. Run from an ESP-IDF "
@@ -125,10 +118,22 @@ def flash_bytes(tdld_bytes, port, source_label):
               "your current Python:  pip install esptool", file=sys.stderr)
         return 2
 
-    cmd = [idf_python, parttool, "--port", port, "write_partition",
-           "--partition-name", "tdld", "--input", tmp_path]
-    print("Running:", " ".join(cmd))
-    return subprocess.call(cmd)
+    # parttool wants a file path, not stdin. Write to a NamedTemporaryFile
+    # so it gets cleaned up regardless of how the script exits.
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=".tdld", delete=False) as tmp:
+        tmp.write(tdld_bytes)
+        tmp_path = tmp.name
+    try:
+        cmd = [idf_python, parttool, "--port", port, "write_partition",
+               "--partition-name", "tdld", "--input", tmp_path]
+        print("Running:", " ".join(cmd))
+        return subprocess.call(cmd)
+    finally:
+        try:
+            os.remove(tmp_path)
+        except OSError:
+            pass
 
 
 def main():
