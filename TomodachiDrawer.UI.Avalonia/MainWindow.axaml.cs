@@ -33,7 +33,7 @@ namespace TomodachiDrawer.UI.Avalonia;
 
 public partial class MainWindow : Window
 {
-    private const string firmwareFileName = "TomodachiDrawer.Firmware.uf2";
+    private const string firmwareFileName = "TomodachiDrawer.Firmware.rp2040.uf2";
 
     private string _currentImagePath = string.Empty;
     private SKBitmap? _currentImage;
@@ -877,10 +877,10 @@ public partial class MainWindow : Window
         if (OperatingSystem.IsMacOS() && baseDirectory.Contains(".app/Contents/MacOS"))
         {
             // In macOS, when you launch `.app` from Finder, the current working directory is root directory `/` (Gemini said),
-            // and the firmware file isn't located there (`/TomodachiDrawer.Firmware.uf2`).
+            // and the firmware file isn't located there (`/TomodachiDrawer.Firmware.rp2040.uf2`).
             // So we need to find the firmware file in the app bundle.
             // `AppContext.BaseDirectory` resolves to `/path/to/TomodachiDrawer.app/Contents/MacOS/`, so we can get the path to the firmware file from there.
-            // The firmware file should locate at `/path/to/TomodachiDrawer.app/Contents/MacOS/TomodachiDrawer.Firmware.uf2`
+            // The firmware file should locate at `/path/to/TomodachiDrawer.app/Contents/MacOS/TomodachiDrawer.Firmware.rp2040.uf2`
             return Path.Combine(baseDirectory, firmwareFileName);
         }
         else
@@ -899,9 +899,9 @@ public partial class MainWindow : Window
         {
             _ = ShowMessageAsync(
                 "Error flashing base firmware",
-                "For some reason could not locate TomodachiDrawer.Firmware.uf2"
+                "For some reason could not locate TomodachiDrawer.Firmware.rp2040.uf2"
                     + "\nPlease ensure that you extracted the program to a zip folder, and ran the executable from that extracted folder."
-                    + "\nIf you can still not flash with this button, you can manually drag the TomodachiDrawer.Firmware.uf2 file to the RPI-RP2 drive on your system to flash it."
+                    + "\nIf you can still not flash with this button, you can manually drag the TomodachiDrawer.Firmware.rp2040.uf2 file to the RPI-RP2 drive on your system to flash it."
             );
             return;
         }
