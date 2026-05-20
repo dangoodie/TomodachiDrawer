@@ -211,6 +211,7 @@ public partial class MainWindow : Window
                     // ExportUF2 / ExportTDLD only need an image - no RP2040 required
                     ExportUF2Button.IsEnabled = hasImage;
                     ExportTDLDButton.IsEnabled = hasImage && !BusyExporting;
+                    ExportTDLDButtonESP.IsEnabled = hasImage && !BusyExporting;
 
                     if (path != null)
                     {
@@ -866,6 +867,7 @@ public partial class MainWindow : Window
         var tspLimit = (float)(TSPTimeLimitUpDown.Value ?? 0.5m);
 
         ExportTDLDButton.IsEnabled = false;
+        ExportTDLDButtonESP.IsEnabled = false;
         BusyExporting = true;
         TimeSpan totalTime = TimeSpan.MaxValue;
         var settings = GetQuantizerSettings();
@@ -907,6 +909,7 @@ public partial class MainWindow : Window
         });
 
         ExportTDLDButton.IsEnabled = true;
+        ExportTDLDButtonESP.IsEnabled = true;
         BusyExporting = false;
         SetEstimate(totalTime);
     }
@@ -1075,6 +1078,22 @@ public partial class MainWindow : Window
                 + "Again, it will reboot, but now you can unplug it and plug it into your switch.\r\n\r\n"
                 + "YOU MUST HAVE \"Pro Controller Wired Commmunication\" ENABLED.\r\n"
                 + "Go to system settings -> Controllers & Accessories -> Pro Controller Wired Communication\r\n"
+        );
+    }
+
+    private void ESP32OutputExplanationButton_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = ShowMessageAsync(
+            "",
+            "Your ESP32-S3 board needs two things in its flash memory:\r\n"
+                + "- The firmware that reads the drawing instructions and pipes them to the Switch\r\n"
+                + "- The drawing instructions themselves.\r\n\r\n"
+                + "To put the board in flash mode, hold the \"BOOT\" button and plug it in, or hold BOOT and tap RESET while it's connected.\r\n\r\n"
+                + "You only flash the firmware once (\"Flash Base Firmware\"). After that, you flash drawings via \"Export To ESP32-S3!\", again with the board in BOOT mode.\r\n\r\n"
+                + "When the firmware first installs the board resets, and the LED will indicate that no drawing data is present yet. Re-enter BOOT mode and hit \"Export To ESP32-S3!\" with an image loaded.\r\n\r\n"
+                + "One UX wrinkle for single-port S3 boards (S3-Zero, QT Py S3, AtomS3, etc.): once the firmware is running, the board is pretending to be a Switch controller on its single USB-C port, so esptool can't reach it anymore. You'll need to put the board back in BOOT mode before each new drawing flash. Dual-port boards (DevKitC-1, DevKitM-1) skip this step.\r\n\r\n"
+                + "YOU MUST HAVE \"Pro Controller Wired Communication\" ENABLED on the Switch.\r\n"
+                + "Go to System Settings -> Controllers & Accessories -> Pro Controller Wired Communication\r\n"
         );
     }
 

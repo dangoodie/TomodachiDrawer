@@ -17,6 +17,10 @@
 			<Setter Property="FontWeight" Value="SemiBold" />
 			<Setter Property="Margin" Value="0,0,0,6" />
 		</Style>
+		<Style Selector="TabItem">
+			<Setter Property="FontSize" Value="14" />
+			<Setter Property="FontWeight" Value="SemiBold" />
+		</Style>
 	</Window.Styles>
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
@@ -244,14 +248,21 @@
 									<ColumnDefinition Width="*" />
 									<ColumnDefinition Width="*" />
 								</Grid.ColumnDefinitions>
-								<Button Grid.Column="0"
-										x:Name="RefreshESP32Button"
-										Content="Re-scan COM Ports"
-										ToolTip.Tip="Probe all serial ports for ESP32-S3 chips. Each probe briefly resets the board on that port - if the board is currently drawing on a Switch, leave it alone and skip the scan."
+								<Button Grid.Column="0" Content="Setup Explanation"
 										HorizontalAlignment="Stretch"
 										Margin="2,0,2,0"
-										Click="RefreshESP32Button_Click" />
-								<Button Grid.Column="1"
+										Click="ESP32OutputExplanationButton_Click" />
+								<Button Grid.Column="1" Content="In-Game setup Info."
+										HorizontalAlignment="Stretch"
+										Margin="2,0,2,0"
+										Click="InGameSetupButton_Click" />
+							</Grid>
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
+								<Button Grid.Column="0"
 										x:Name="FlashESP32FirmwareButton"
 										IsEnabled="False"
 										Content="Flash Base Firmware"
@@ -259,6 +270,13 @@
 										HorizontalAlignment="Stretch"
 										Margin="2,0,2,0"
 										Click="FlashESP32FirmwareButton_Click" />
+								<Button Grid.Column="1"
+										x:Name="RefreshESP32Button"
+										Content="Re-scan COM Ports"
+										ToolTip.Tip="Probe all serial ports for ESP32-S3 chips. Each probe briefly resets the board on that port - if the board is currently drawing on a Switch, leave it alone and skip the scan."
+										HorizontalAlignment="Stretch"
+										Margin="2,0,2,0"
+										Click="RefreshESP32Button_Click" />
 							</Grid>
 							<Button x:Name="ExportESP32Button"
 									IsEnabled="False"
@@ -268,6 +286,13 @@
 									HorizontalAlignment="Stretch"
 									Margin="2,0,0,0"
 									Click="ExportESP32Button_Click" />
+							<Button x:Name="ExportTDLDButtonESP"
+									IsEnabled="False"
+									Content="Export to .tdld"
+									ToolTip.Tip="Saves the raw .tdld file (the binary format the firmware reads). Useful for sharing drawings, flashing manually via parttool.py, or inspecting the opcode stream."
+									HorizontalAlignment="Stretch"
+									Margin="2,0,0,0"
+									Click="ExportTDLDButton_Click" />
 						</StackPanel>
 					</TabItem>
 				</TabControl>
