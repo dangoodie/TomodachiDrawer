@@ -14,6 +14,8 @@ internal class AppSettings
     public bool CheckForUpdatesOnStart { get; set; } = true;
 
     public int FirstStartId { get; set; } = 0;
+
+    public string SelectedESP32BoardId { get; set; } = "devkitc_1_r38";
 }
 
 // Source gen serialization to avoid trimming warnings.

@@ -262,19 +262,30 @@ public partial class MainWindow : Window
     private void StartESP32Polling()
     {
         _bundledEsptoolPath = ESP32S3Flasher.FindEsptool();
-        _bundledFirmware = ESP32S3Flasher.FindBundledFirmware(out var firmwareMissing);
+
+        // Populate the board picker. Setting SelectedIndex below triggers
+        // ESP32BoardComboBox_SelectionChanged, which is what actually resolves
+        // _bundledFirmware against the chosen board's bin.
+        ESP32BoardComboBox.ItemsSource = ESP32S3Flasher.SupportedBoards;
+        var savedBoardId = _currentSettings.SelectedESP32BoardId
+                           ?? ESP32S3Flasher.DefaultBoardId;
+        int savedIdx = 0;
+        for (int i = 0; i < ESP32S3Flasher.SupportedBoards.Count; i++)
+        {
+            if (ESP32S3Flasher.SupportedBoards[i].Id == savedBoardId)
+            {
+                savedIdx = i;
+                break;
+            }
+        }
+        ESP32BoardComboBox.SelectedIndex = savedIdx;
+
         if (_bundledEsptoolPath == null)
         {
             AppendLog(
                 "ESP32-S3 disabled - esptool not bundled. CI populates EspTools/ on "
                 + "release; for local dev drop esptool.exe in there or have ESP-IDF on PATH."
             );
-        }
-        if (_bundledFirmware == null)
-        {
-            AppendLog($"ESP32-S3 base-firmware flash disabled - {firmwareMissing}. "
-                + "Build TomodachiDrawer.Firmware.ESP32S3 (idf.py build) so the bins land "
-                + "in build/ and the next UI build auto-copies them.");
         }
         UpdateESP32UI();
 
@@ -330,6 +341,22 @@ public partial class MainWindow : Window
         RefreshESP32Button.IsEnabled = _bundledEsptoolPath != null && !BusyExporting;
         FlashESP32FirmwareButton.IsEnabled =
             ready && _bundledFirmware != null && !BusyExporting;
+    }
+
+    private void ESP32BoardComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ESP32BoardComboBox.SelectedItem is not ESP32S3Flasher.BoardInfo board)
+            return;
+        _currentSettings.SelectedESP32BoardId = board.Id;
+        SaveSettings();
+        _bundledFirmware = ESP32S3Flasher.FindBundledFirmware(board.Id, out var firmwareMissing);
+        if (_bundledFirmware == null)
+        {
+            AppendLog($"ESP32-S3 base-firmware flash disabled - {firmwareMissing}. "
+                + "Build TomodachiDrawer.Firmware.ESP32S3 (idf.py build) so the bins land "
+                + "in build/ and the next UI build auto-copies them.");
+        }
+        UpdateESP32UI();
     }
 
     private async void RefreshESP32Button_Click(object? sender, RoutedEventArgs e)

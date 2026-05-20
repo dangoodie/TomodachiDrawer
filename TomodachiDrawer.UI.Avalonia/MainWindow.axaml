@@ -246,6 +246,26 @@
 									   Text="ESP32-S3 Status: scanning..." />
 							<Grid>
 								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
+								<TextBlock Grid.Column="0"
+										   Text="Board:"
+										   VerticalAlignment="Center"
+										   Margin="2,0,4,0" />
+								<ComboBox Grid.Column="1"
+										  x:Name="ESP32BoardComboBox"
+										  HorizontalAlignment="Stretch"
+										  ToolTip.Tip="Picks which firmware variant to flash. The bundled firmware only differs per board for the onboard WS2812 LED GPIO - HID/controller behavior is identical, so the wrong pick just means the status LED won't blink."
+										  SelectionChanged="ESP32BoardComboBox_SelectionChanged" />
+							</Grid>
+							<TextBlock Text="Picks which onboard LED GPIO the firmware drives. If the LED stays dark after flashing, pick a different board and reflash."
+									   FontSize="11"
+									   Foreground="Gray"
+									   TextWrapping="Wrap"
+									   Margin="2,0,2,2" />
+							<Grid>
+								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="*" />
 									<ColumnDefinition Width="*" />
 								</Grid.ColumnDefinitions>

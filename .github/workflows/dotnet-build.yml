@@ -33,8 +33,23 @@ jobs:
     - name: Test
       run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal /p:EnableWindowsTargeting=true
   build-firmware:
-    name: Build ESP32-S3 firmware
+    name: Build ESP32-S3 firmware (${{ matrix.board }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # One firmware bin per board. Board only affects the WS2812 GPIO -
+        # bootloader and partition table are identical across all entries.
+        # When adding a board: add a Kconfig entry in main/Kconfig.projbuild,
+        # add a sdkconfig.defaults.<id> file, and add the id below.
+        board:
+          - devkitc_1_r38
+          - devkitc_1_r48
+          - s3_zero
+          - devkitm_1
+          - qtpy_s3
+          - lolin_s3_mini
+          - atom_s3
     env:
       IDF_VERSION: v6.0
     steps:
@@ -54,20 +69,23 @@ jobs:
         esp_idf_version: ${{ env.IDF_VERSION }}
         target: esp32s3
         path: 'TomodachiDrawer.Firmware.ESP32S3'
+        command: idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.${{ matrix.board }}" build
     - name: Save ESP-IDF docker image for next run
-      if: steps.idf-docker-cache.outputs.cache-hit != 'true'
+      # Only one matrix entry saves to avoid 7 jobs racing on the same cache key.
+      if: steps.idf-docker-cache.outputs.cache-hit != 'true' && matrix.board == 'devkitc_1_r38'
       run: docker save espressif/idf:${{ env.IDF_VERSION }} -o /tmp/idf-docker-image.tar
     - name: Stage firmware artifacts
       run: |
         mkdir firmware_artifacts
         cp TomodachiDrawer.Firmware.ESP32S3/build/bootloader/bootloader.bin firmware_artifacts/
         cp TomodachiDrawer.Firmware.ESP32S3/build/partition_table/partition-table.bin firmware_artifacts/
-        cp TomodachiDrawer.Firmware.ESP32S3/build/TomodachiDrawer_FW_ESP32S3.bin firmware_artifacts/
+        # App bin gets a board suffix so all variants can coexist in EspFirmware/.
+        cp TomodachiDrawer.Firmware.ESP32S3/build/TomodachiDrawer_FW_ESP32S3.bin firmware_artifacts/TomodachiDrawer_FW_ESP32S3-${{ matrix.board }}.bin
         ls -la firmware_artifacts/
     - name: Upload firmware
       uses: actions/upload-artifact@v7
       with:
-        name: esp32s3-firmware
+        name: esp32s3-firmware-${{ matrix.board }}
         path: firmware_artifacts/
 
   publish-avalonia:
@@ -91,8 +109,12 @@ jobs:
     - name: Download ESP32-S3 firmware
       uses: actions/download-artifact@v8
       with:
-        name: esp32s3-firmware
+        # Pull all per-board artifacts and merge into one EspFirmware/ dir.
+        # Common files (bootloader.bin, partition-table.bin) are identical
+        # across boards so the overwrites on merge are harmless.
+        pattern: esp32s3-firmware-*
         path: TomodachiDrawer.UI.Avalonia/EspFirmware
+        merge-multiple: true
     - name: Download esptool for ${{ matrix.runtime }}
       shell: bash
       run: |
