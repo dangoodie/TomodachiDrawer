@@ -79,6 +79,7 @@
 					<RowDefinition Height="*" />
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
 				<Border Grid.Row="0" Classes="group" Margin="0,0,0,6">
 					<StackPanel Spacing="6">
