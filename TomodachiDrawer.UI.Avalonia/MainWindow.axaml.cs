@@ -156,13 +156,21 @@ public partial class MainWindow : Window
     {
         if (_currentSettings.FirstStartId != CURRENT_WELCOME_ID)
         {
-            ShowWelcomeMessage();
+            await ShowWelcomeMessage();
             _currentSettings.FirstStartId = CURRENT_WELCOME_ID;
         }
 
 #if DEBUG
         InsertDebugMenuItems();
 #endif
+
+        if (_currentSettings.EnableTelemetry == null)
+        {
+            // User hasnt agreed/disagreed.
+            var accepted = await new TelemetryPrompt().ShowDialog<bool>(this);
+            _currentSettings.EnableTelemetry = accepted;
+        }
+
         SaveSettings();
 
         if (!IsVCRuntimeInstalled())
@@ -181,7 +189,7 @@ public partial class MainWindow : Window
     // Welcome message stuff. For important changes, the ID is incremented by one by hand whenever something notable changes.
     // This is only really needed for Mac since its settings are saved in a way that persists more readily.
     private const int CURRENT_WELCOME_ID = 2;
-    private async void ShowWelcomeMessage()
+    private async Task ShowWelcomeMessage()
     {
         await ShowMessageAsync(
             "Welcome to TomodachiDrawer",
@@ -1231,5 +1239,12 @@ public partial class MainWindow : Window
     private void EnableHomeCanvas_IsCheckedChanged(object? sender, RoutedEventArgs e)
     {
         // TODO: Notify if non 256x256 image.
+    }
+
+    private async void OpenTelemetryPrompt_Click(object? sender, RoutedEventArgs e)
+    {
+        var answer = await new TelemetryPrompt().ShowDialog<bool>(this);
+        _currentSettings.EnableTelemetry = answer;
+        SaveSettings();
     }
 }

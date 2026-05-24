@@ -43,6 +43,11 @@
 					ToggleType="CheckBox"
 					Click="EnableExperimentalMenuItem_Click"
 				/>
+				<MenuItem
+					x:Name="OpenTelemetryPrompt"
+					Header="_Open Telemetry Prompt"
+					Click="OpenTelemetryPrompt_Click"
+				/>
 			</MenuItem>
 			<MenuItem Header="_Templates" x:Name="MenuTemplates">
 				<!-- Inserted at runtime -->

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace TomodachiDrawer.UI.Avalonia
 {
@@ -14,7 +11,7 @@ namespace TomodachiDrawer.UI.Avalonia
 
         private const string TELEMETRY_URL = "https://telemetry.l7y.media/";
 
-        private HttpClient _http;
+        private readonly HttpClient _http;
 
         public record StartupEventDto(
             string Os,

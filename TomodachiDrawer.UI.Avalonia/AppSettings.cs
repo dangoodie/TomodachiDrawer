@@ -14,6 +14,9 @@ internal class AppSettings
     public bool CheckForUpdatesOnStart { get; set; } = true;
 
     public int FirstStartId { get; set; } = 0;
+
+    /// <summary>This is null by default to indicate they havent been asked yet.</summary>
+    public bool? EnableTelemetry { get; set; } = null;
 }
 
 // Source gen serialization to avoid trimming warnings.
