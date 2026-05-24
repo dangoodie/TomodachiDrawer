@@ -27,7 +27,8 @@ namespace TomodachiDrawer.UI.Avalonia
             string QuantizerMode,
             int? ColourLimit,
             string SwitchVersion,
-            bool ExperimentalFeatures
+            bool ExperimentalFeatures,
+            double TotalDrawTimeSeconds
         );
 
 
