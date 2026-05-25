@@ -16,7 +16,7 @@ internal static class UF2Flasher
             );
         const uint TargetBase = 0x10100000u; // 1MB into flash, so 1MB limit — same layout on both chips.
         const uint PayloadSize = 256u;
-        uint familyId = chip == RPChipType.RP2350 ? 0xe48bff59u : 0xE48BFF56u;
+        uint familyId = chip == RPChipType.RP2350 ? 0xe48bff57u : 0xE48BFF56u;
 
         int blockCount = (tdldData.Length + (int)PayloadSize - 1) / (int)PayloadSize;
         byte[] output = new byte[blockCount * 512];

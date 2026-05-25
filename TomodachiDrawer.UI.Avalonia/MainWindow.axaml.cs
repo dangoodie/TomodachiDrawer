@@ -85,7 +85,6 @@ public partial class MainWindow : Window
         this.Title = $"TomodachiDrawer - {GetVersionString(false)}";
 #endif
 
-        StartPicoPolling();
         if (CheckForUpdatesCheckBox.IsChecked)
             _ = PerformAsyncUpdateCheck();
 
@@ -193,6 +192,8 @@ public partial class MainWindow : Window
             // Discard to avoid blocking.
             _ = _telemetry.ReportStart();
         }
+
+        StartPicoPolling();
     }
 
     // Welcome message stuff. For important changes, the ID is incremented by one by hand whenever something notable changes.
