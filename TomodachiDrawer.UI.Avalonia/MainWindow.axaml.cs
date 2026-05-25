@@ -702,7 +702,7 @@ public partial class MainWindow : Window
         _ = _telemetry.ReportImage(new TelemetryService.ImageEventDto(
             imageWidth, imageHeight, colourCount, quantizerName, colourLimit,
             _currentSettings.SelectedSwitchVersion.ToString(),
-            enableExperimental, totalTime.TotalSeconds
+            enableExperimental, totalTime.TotalSeconds, tspLimit
         ));
 
         BusyExporting = false;
@@ -862,7 +862,7 @@ public partial class MainWindow : Window
         _ = _telemetry.ReportImage(new TelemetryService.ImageEventDto(
             imageWidth, imageHeight, colourCount, quantizerName, colourLimit,
             _currentSettings.SelectedSwitchVersion.ToString(),
-            enableExperimental, totalTime.TotalSeconds
+            enableExperimental, totalTime.TotalSeconds, tspLimit
         ));
 
         ExportUF2Button.IsEnabled = true;

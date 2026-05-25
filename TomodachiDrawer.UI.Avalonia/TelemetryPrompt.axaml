@@ -27,6 +27,7 @@
 				<TextBlock Text="  - Selected Switch version" />
 				<TextBlock Text="  - Whether experimental features are enabled" />
 				<TextBlock Text="  - Draw time estimate" />
+				<TextBlock Text="  - TSP Time Limit" />
 			</StackPanel>
 		</Expander>
 

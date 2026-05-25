@@ -28,7 +28,8 @@ namespace TomodachiDrawer.UI.Avalonia
             int? ColourLimit,
             string SwitchVersion,
             bool ExperimentalFeatures,
-            double TotalDrawTimeSeconds
+            double TotalDrawTimeSeconds,
+            double TspTimeLimit
         );
 
 
