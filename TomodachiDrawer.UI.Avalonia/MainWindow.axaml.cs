@@ -202,9 +202,9 @@ public partial class MainWindow : Window
     private async Task ShowWelcomeMessage()
     {
         await ShowMessageAsync(
-            "Welcome to TomodachiDrawer",
+            "Welcome to TomodachiDrawer!",
             "0.6.0 has added support for RP2350 based boards (RP2350-Zero, Raspberry Pi Pico 2, etc) on top of the RP2040 support." +
-            "\n0.5.0 added a tool for helping you with more complex, non square templates." +
+            "\n\n0.5.0 added a tool for helping you with more complex, non square templates." +
             "\nAt the top menu bar, select \"Templates\" and choose the item type you want, it will open an editor with a preview of the layout, and copy it to your clipboard for you to easily edit in other image editing software."
         );
     }
