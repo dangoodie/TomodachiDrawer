@@ -64,7 +64,7 @@
     <Move SourceFiles="@(PublishFiles)" DestinationFolder="$(MacOsDir)\%(RecursiveDir)" />
     <Copy SourceFiles="@(FirmwareFiles)" DestinationFolder="$(MacOsDir)" />
     <Copy SourceFiles="$(ProjectDir)Packaging/macOS/AppIcon.icns" DestinationFolder="$(ResourcesDir)" />
-    <Copy SourceFiles="$(ProjectDir)Packaging/macOS/README.txt" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="$(ProjectDir)Packaging/macOS/MAC_USER_MUST_README-IMPORTANT.txt" DestinationFolder="$(PublishDir)" />
     <PropertyGroup>
       <PlistSource>$(ProjectDir)Packaging/macOS/Info.plist</PlistSource>
       <PlistDestination>$([System.IO.Path]::Combine('$(ContentsDir)', 'Info.plist'))</PlistDestination>
