@@ -21,11 +21,7 @@ Initial setup requires a few steps, made easier by the UI.
 
 ### Following the YouTube tutorial is recommended:
 
-Note: flashing lights warning for video, apologies.
-[YouTube Tutorial](https://youtu.be/GIaiw3gzabo)
-
-An addendum video covering the changes since that was made is available here:
-[Addendum Tutorial](https://youtu.be/9rVLea1-nlY)
+[Updated TomodachiDrawer Tutorial](https://youtu.be/5rxu7hX95O8) 
 
 ### Downloads
 Downloads are available in the releases, they come in a few forms
