@@ -3,7 +3,10 @@
 TomodachiDrawer is a collection of firmware and software that generates inputs to control a Nintendo Switch to draw arbitrary images in the Palette House.
 
 ## WARNING: Switch 1 is prone to desyncs
-See #12 , unfortunately it seems that the Switch 1 is prone to desyncing randomly from inexplicable lag spikes. Current testing suggests this is related to the 3D preview. Switch 2 users are unaffected, and drawings of types that are just lone transparent images do not seem to be prone to these effects. 0.3.1 and 0.3.2 added some mitigations for some other types of delay, but the lag one is still under investigation. If you have any information or clips of the desync occuring, be sure to comment it on that issue!
+See #12 , unfortunately it seems that the Switch 1 is prone to desyncing randomly from inexplicable lag spikes.
+Our testing seems to suggest this is partially due to the 3D preview causing the lag, but even with drawings with non-3d previews, it can still desync for longer drawings.
+The best way to make it work is to create stamps and do one corner at a time and then combine it at the end. This is, understandably, quite annoying. But the alternative is slowing the program down by 10x turning a 2 hour drawing into 20 hours, which is not exactly realistic.
+If you figure out an alternative way to avoid the lag, please open an issue!
 
 <img src="Docs/baconator_preview.webp" width="600" alt="Tomodachi Drawer drawing a Baconator">
 <img src="Docs/nurture_preview.webp" width="600" alt="Tomodachi Drawer drawing the Porter Robinson album art for Nurture">
@@ -14,6 +17,8 @@ It has a crossplatform Avalonia UI desktop app that supports flashing directly t
 
 ## Hardware Compatibility
 This was designed for an RP2040-Zero as it was one of the cheapest options, however any RP2040 based board *should* be compatible, with support for the LED on the standard Raspberry Pi Pico too.
+
+As of 0.6.0 the program is also compatibile with RP2350 based boards, such as the RP2350-Zero or the Raspberry Pi Pico 2 or 2W
 
 ## How To Use
 
@@ -32,7 +37,9 @@ Downloads are available in the releases, they come in a few forms
 platform can be win64 for windows, osx-arm64 for Mac on ARM cpus, osx64 for Mac on x64 cpus, and linux64 and linuxarm64 for the same on linux.
 Download the one that is right for your computer, for mac users with any recent macbook arm64 should work.
 
-For Linux and Mac users, you may need to run chmod +x binaryNameHere or go into your settings to allow it.
+For Linux users you will need to MAY need to run chmod +x to make the executable... executable.
+
+For mac users, there is some important steps to follow to make the program runnable included in a txt file with the program.
 
 ### Or briefly, in text:
 
@@ -49,7 +56,7 @@ For Linux and Mac users, you may need to run chmod +x binaryNameHere or go into 
     - Note: you must have Palette house open, on "pro" mode, the cursor in the top left of where you want it drawn, zoomed out, and your top colour to be set to black.
 12. Upon completion, the RGB LED on the Pi will go to a rainbow. If you disconnect it and reconnect it, it will draw it again. Connect to your PC to change the image!
 
-#### If the program does not recognize your RP2040
+#### If the program does not recognize your RP2040/RP2350
 The logic may be delicate for Linux and Mac platforms as those are ones I cannot test.
 If it does not detect it, you can still drag-and-drop the .uf2 included with the download to your Pi for step 7, and for the image data, select "export .uf2" and save it to a destination, and once done, drag and drop onto the RP2040 drive to flash it manually.
 
