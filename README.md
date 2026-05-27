@@ -77,4 +77,4 @@ This project depends on the following libraries:
 
 - SkiaSharp	(For image reading/writing)
 - Google.OrTools (for the TSP solving)
-- ImageSharp (For its WuQuantizer)
+- JeremyAnsel.ColorQuant (For its WuQuantizer)
