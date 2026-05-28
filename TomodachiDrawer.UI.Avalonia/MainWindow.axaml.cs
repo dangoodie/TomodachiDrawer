@@ -544,6 +544,8 @@ public partial class MainWindow : Window
         var preview = await Task.Run(() => GetPreview(source, quantizerSettings, denoiser)).ConfigureAwait(true);
 
         PreviewImage.Source = ToAvaloniaBitmap(preview);
+        // update the preview label to indicate the size of the image just for user reference
+        PreviewHeader.Text = $"Preview ({_currentImage.Width}x{_currentImage.Height})";
         AppendLog(
             $"Updated preview for {_currentImagePath} using {quantizerSettings.quantizerName}"
         );

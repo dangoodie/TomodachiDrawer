@@ -18,10 +18,10 @@
 			<Setter Property="Margin" Value="0,0,0,6" />
 		</Style>
 		<Style Selector="TabItem">
-            <Setter Property="MinHeight" Value="0" /> 
-            <Setter Property="FontSize" Value="22" />
-            <Setter Property="Padding" Value="8, 4" /> 
-            <Setter Property="Margin" Value="0" />
+			<Setter Property="MinHeight" Value="0" />
+			<Setter Property="FontSize" Value="22" />
+			<Setter Property="Padding" Value="8, 4" />
+			<Setter Property="Margin" Value="0" />
 		</Style>
 	</Window.Styles>
 	<DockPanel>
@@ -33,10 +33,10 @@
 			</MenuItem>
 			<MenuItem Header="_Settings" StaysOpenOnClick="True">
 				<MenuItem
-				    x:Name="CheckForUpdatesCheckBox"
-					Header="_Check For Updates On Start"
-					ToggleType="CheckBox"
-					Click="CheckForUpdatesCheckBox_Click"
+				x:Name="CheckForUpdatesCheckBox"
+				Header="_Check For Updates On Start"
+				ToggleType="CheckBox"
+				Click="CheckForUpdatesCheckBox_Click"
 				/>
 				<MenuItem Header="_Theme">
 					<MenuItem x:Name="ThemeSystemMenuItem" Header="_Match System" ToggleType="CheckBox" IsChecked="True" Click="ThemeMenuItem_Click"/>
@@ -44,15 +44,15 @@
 					<MenuItem x:Name="ThemeDarkMenuItem" Header="_Dark" ToggleType="CheckBox" Click="ThemeMenuItem_Click"/>
 				</MenuItem>
 				<MenuItem
-					x:Name="EnableExperimentalMenuItem"
-					Header="_Enable Experimental Features"
-					ToggleType="CheckBox"
-					Click="EnableExperimentalMenuItem_Click"
+				x:Name="EnableExperimentalMenuItem"
+				Header="_Enable Experimental Features"
+				ToggleType="CheckBox"
+				Click="EnableExperimentalMenuItem_Click"
 				/>
 				<MenuItem
-					x:Name="OpenTelemetryPrompt"
-					Header="_Open Telemetry Prompt"
-					Click="OpenTelemetryPrompt_Click"
+				x:Name="OpenTelemetryPrompt"
+				Header="_Open Telemetry Prompt"
+				Click="OpenTelemetryPrompt_Click"
 				/>
 			</MenuItem>
 			<MenuItem Header="_Templates" x:Name="MenuTemplates">
@@ -65,33 +65,33 @@
 			</MenuItem>
 			<MenuItem Header="_Help">
 				<MenuItem
-					x:Name="MenuHelpOpenGitHub"
-					Header="_Open GitHub Repo"
-					Click="MenuHelpOpenGitHub_Click"
+				x:Name="MenuHelpOpenGitHub"
+				Header="_Open GitHub Repo"
+				Click="MenuHelpOpenGitHub_Click"
 				/>
 				<MenuItem
-					x:Name="MenuHelpOpenWelcome"
-					Header="_Show Welcome Again"
-					Click="MenuHelpOpenWelcome_Click"
+				x:Name="MenuHelpOpenWelcome"
+				Header="_Show Welcome Again"
+				Click="MenuHelpOpenWelcome_Click"
 				/>
 				<MenuItem
-					x:Name="MenuHelpCheckForUpdate"
-					Header="Check For Update"
-					Click="MenuHelpCheckForUpdate_Click"
+				x:Name="MenuHelpCheckForUpdate"
+				Header="Check For Update"
+				Click="MenuHelpCheckForUpdate_Click"
 				/>
 				<MenuItem
-					Header="_Setup Explanation"
-					Click="OutputExplanationButton_Click"
+				Header="_Setup Explanation"
+				Click="OutputExplanationButton_Click"
 				/>
 				<MenuItem
-					Header="_In-Game Setup Info"
-					Click="InGameSetupButton_Click"
+				Header="_In-Game Setup Info"
+				Click="InGameSetupButton_Click"
 				/>
 				<Separator/>
 				<MenuItem
-					x:Name="MenuHelpAbout"
-					Header="_About"
-					Click="MenuHelpAbout_Click"
+				x:Name="MenuHelpAbout"
+				Header="_About"
+				Click="MenuHelpAbout_Click"
 				/>
 			</MenuItem>
 		</Menu>
@@ -161,7 +161,7 @@
 								  Content="Auto Home Canvas To Top Left (Resets canvas)"
 								  ToolTip.Tip="At the beginning, the program will zoom out, and set itself at the very very top left of the canvas. This is automatically checked for full size (256x256) images. Additionally, to ensure the bucket tool works for Switch 2 it will clear the canvas."
 								  IsCheckedChanged="EnableHomeCanvas_IsCheckedChanged"
-						/>
+								  />
 					</StackPanel>
 				</Border>
 				<Border Grid.Row="2" Classes="group" Margin="0,0,0,6">
@@ -257,9 +257,11 @@
 
 			<Border Grid.Column="1" Classes="group" Margin="0,0,6,0">
 				<DockPanel>
-					<TextBlock DockPanel.Dock="Top"
-							   Classes="header"
-							   Text="Preview" />
+					<TextBlock
+					x:Name="PreviewHeader"
+					DockPanel.Dock="Top"
+					Classes="header"
+					Text="Preview" />
 					<Grid DockPanel.Dock="Top" Margin="0,0,0,6">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
