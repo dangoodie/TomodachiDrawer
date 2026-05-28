@@ -149,6 +149,9 @@ namespace TomodachiDrawer.Core
                     _log(
                         $"\tUsing bucket to fill most prevalent colour: {bucketColour.Value.DisplayName}"
                     );
+
+                    _toolbar.ClearCanvas();
+
                     _toolbar.SelectBucket();
                     _palette.SelectColour(bucketColour.Value, 25.0);
                     _realOutput.Tap(Button.A);
