@@ -46,9 +46,10 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Install toolchain
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y cmake ninja-build gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential python3 git
+      uses: awalsh128/cache-apt-pkgs-action@v1.6.0
+      with:
+        packages: cmake ninja-build gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential python3 git
+        version: 1.0
     - name: Cache pico-sdk
       id: cache-pico-sdk
       uses: actions/cache@v5
