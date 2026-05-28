@@ -8,6 +8,8 @@ Our testing seems to suggest this is partially due to the 3D preview causing the
 The best way to make it work is to create stamps and do one corner at a time and then combine it at the end. This is, understandably, quite annoying. But the alternative is slowing the program down by 10x turning a 2 hour drawing into 20 hours, which is not exactly realistic.
 If you figure out an alternative way to avoid the lag, please open an issue!
 
+**Update as of 2026-05-28:** Per [#97](https://github.com/Lucas7yoshi/TomodachiDrawer/issues/97) this may be partially induced by playing in docked mode. You *can* draw in handheld mode, however you are then limited by battery life. The game running at 1080p, plus being in the dock which does not have any active fan (unlike the Switch 2) may be causing thermal issues that induce the lag. Worth trying if you are limited to the Switch 1.
+
 <img src="Docs/baconator_preview.webp" width="600" alt="Tomodachi Drawer drawing a Baconator">
 <img src="Docs/nurture_preview.webp" width="600" alt="Tomodachi Drawer drawing the Porter Robinson album art for Nurture">
 
