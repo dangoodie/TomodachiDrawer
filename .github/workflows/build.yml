@@ -50,6 +50,7 @@ jobs:
       with:
         packages: cmake ninja-build gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential python3 git
         version: 1.0
+        execute_install_scripts: true
     - name: Cache pico-sdk
       id: cache-pico-sdk
       uses: actions/cache@v5
