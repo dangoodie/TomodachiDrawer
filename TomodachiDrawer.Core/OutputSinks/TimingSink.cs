@@ -73,7 +73,12 @@
             Delay(releaseDuration);
         }
 
-        void ISwitchOutput.TapStick(Stick stick, byte value, double holdDuration, double releaseDuration)
+        void ISwitchOutput.TapStick(
+            Stick stick,
+            byte value,
+            double holdDuration,
+            double releaseDuration
+        )
         {
             _totalMilliseconds += holdDuration + releaseDuration;
             _actions.Add(o => o.TapStick(stick, value, holdDuration, releaseDuration));

@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -8,15 +11,8 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
-
 using Microsoft.Win32;
-
 using SkiaSharp;
-
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 using TomodachiDrawer.Core;
 using TomodachiDrawer.Core.Extensions;
 using TomodachiDrawer.Core.ImageProcessing;
@@ -24,17 +20,20 @@ using TomodachiDrawer.Core.ImageProcessing.Denoising;
 using TomodachiDrawer.Core.ImageProcessing.Quantizers;
 using TomodachiDrawer.Core.Models;
 using TomodachiDrawer.Core.OutputSinks;
+using Button = Avalonia.Controls.Button; // conflict with the Button enum in SinkEnums
 #if DEBUG
 using TomodachiDrawer.DebugTools;
 #endif
-using Button = Avalonia.Controls.Button; // conflict with the Button enum in SinkEnums
+
 
 namespace TomodachiDrawer.UI.Avalonia;
 
 public partial class MainWindow : Window
 {
     private static string GetRPFirmwareFileName(RPChipType chip) =>
-        chip == RPChipType.RP2350 ? "TomodachiDrawer.Firmware.rp2350.uf2" : "TomodachiDrawer.Firmware.rp2040.uf2";
+        chip == RPChipType.RP2350
+            ? "TomodachiDrawer.Firmware.rp2350.uf2"
+            : "TomodachiDrawer.Firmware.rp2040.uf2";
 
     private string _currentImagePath = string.Empty;
     private SKBitmap? _currentImage;
@@ -83,7 +82,6 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, OnDrop);
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
 
-
 #if DEBUG
         this.Title = $"TomodachiDrawer.UI.Avalonia - {GetVersionString(true)}";
 #else
@@ -122,10 +120,7 @@ public partial class MainWindow : Window
         foreach (var mask in Enum.GetValues<TomodachiLifeMask>().Cast<TomodachiLifeMask>())
         {
             var desc = mask.GetDescription();
-            var menuItem = new MenuItem()
-            {
-                Header = desc
-            };
+            var menuItem = new MenuItem() { Header = desc };
             menuItem.Click += (s, e) => OpenTemplate(mask);
             MenuTemplates.Items.Add(menuItem);
         }
@@ -144,8 +139,13 @@ public partial class MainWindow : Window
             }
             else if (templateOutput.CouldNotLoad)
             {
-                AppendLog($"Template editor failed to load the template for {mask.GetDescription()}");
-                _ = ShowMessageAsync("Error loading template", "The template tool could not find the image. This REALLY shouldn't happen... Try reinstalling?");
+                AppendLog(
+                    $"Template editor failed to load the template for {mask.GetDescription()}"
+                );
+                _ = ShowMessageAsync(
+                    "Error loading template",
+                    "The template tool could not find the image. This REALLY shouldn't happen... Try reinstalling?"
+                );
             }
             else
             {
@@ -183,9 +183,9 @@ public partial class MainWindow : Window
         {
             await ShowMessageAsync(
                 "WARNING: MISSING LIBRARIES",
-                $"In order for this program to run, you MUST install the VC Redistributable." +
-                $"\n\nClick the open link button to install it. " +
-                $"If you do not install it, this program will probably crash silently.",
+                $"In order for this program to run, you MUST install the VC Redistributable."
+                    + $"\n\nClick the open link button to install it. "
+                    + $"If you do not install it, this program will probably crash silently.",
                 new Uri("https://aka.ms/vc14/vc_redist.x64.exe"),
                 "Download Redistributable"
             );
@@ -204,13 +204,14 @@ public partial class MainWindow : Window
     // Welcome message stuff. For important changes, the ID is incremented by one by hand whenever something notable changes.
     // This is only really needed for Mac since its settings are saved in a way that persists more readily.
     private const int CURRENT_WELCOME_ID = 3;
+
     private async Task ShowWelcomeMessage()
     {
         await ShowMessageAsync(
             "Welcome to TomodachiDrawer!",
-            "0.6.0 has added support for RP2350 based boards (RP2350-Zero, Raspberry Pi Pico 2, etc) on top of the RP2040 support." +
-            "\n\n0.5.0 added a tool for helping you with more complex, non square templates." +
-            "\nAt the top menu bar, select \"Templates\" and choose the item type you want, it will open an editor with a preview of the layout, and copy it to your clipboard for you to easily edit in other image editing software."
+            "0.6.0 has added support for RP2350 based boards (RP2350-Zero, Raspberry Pi Pico 2, etc) on top of the RP2040 support."
+                + "\n\n0.5.0 added a tool for helping you with more complex, non square templates."
+                + "\nAt the top menu bar, select \"Templates\" and choose the item type you want, it will open an editor with a preview of the layout, and copy it to your clipboard for you to easily edit in other image editing software."
         );
     }
 
@@ -243,16 +244,10 @@ public partial class MainWindow : Window
 #if DEBUG
     private void InsertDebugMenuItems()
     {
-        var debugMenuItem = new MenuItem()
-        {
-            Header = "_Debug",
-        };
+        var debugMenuItem = new MenuItem() { Header = "_Debug" };
         Menu.Items.Add(debugMenuItem);
 
-        MenuDebugConnectVirtualGamepad = new MenuItem()
-        {
-            Header = "_Connect Virtual Gamepad",
-        };
+        MenuDebugConnectVirtualGamepad = new MenuItem() { Header = "_Connect Virtual Gamepad" };
         MenuDebugConnectVirtualGamepad.Click += MenuDebugConnectVirtualGamepad_Click;
         debugMenuItem.Items.Add(MenuDebugConnectVirtualGamepad);
 
@@ -271,7 +266,6 @@ public partial class MainWindow : Window
         };
         MenuDebugOpenVirtualGamepadController.Click += MenuDebugOpenVirtualGamepadController_Click;
         debugMenuItem.Items.Add(MenuDebugOpenVirtualGamepadController);
-
     }
 #endif
 
@@ -357,7 +351,9 @@ public partial class MainWindow : Window
                         + "Please open System Settings -> Privacy & Security -> Files & Folders, find \"TomodachiDrawer\", and make sure \"Removable Volumes\" is enabled.\n\n"
                         + "This is required for the app to write the firmware directly to your Pico drive.\r"
                         + $"Or you can manually copy the .uf2 file to {drivePath} if you want to avoid granting permissions.",
-                    new Uri("x-apple.systempreferences:com.apple.preference.security?Privacy_FilesAndFolders"),
+                    new Uri(
+                        "x-apple.systempreferences:com.apple.preference.security?Privacy_FilesAndFolders"
+                    ),
                     "Open System Settings"
                 );
             }
@@ -377,7 +373,8 @@ public partial class MainWindow : Window
     {
         _ = Task.Run(async () =>
         {
-            bool lastRp2040 = false, lastRp2350 = false;
+            bool lastRp2040 = false,
+                lastRp2350 = false;
             while (!_cts.Token.IsCancellationRequested)
             {
                 try
@@ -388,8 +385,18 @@ public partial class MainWindow : Window
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         bool hasImage = _currentImage != null;
-                        lastRp2040 = UpdateChipUI(RPChipType.RP2040, rp2040Path, hasImage, lastRp2040);
-                        lastRp2350 = UpdateChipUI(RPChipType.RP2350, rp2350Path, hasImage, lastRp2350);
+                        lastRp2040 = UpdateChipUI(
+                            RPChipType.RP2040,
+                            rp2040Path,
+                            hasImage,
+                            lastRp2040
+                        );
+                        lastRp2350 = UpdateChipUI(
+                            RPChipType.RP2350,
+                            rp2350Path,
+                            hasImage,
+                            lastRp2350
+                        );
                     });
                 }
                 catch (OperationCanceledException)
@@ -416,7 +423,9 @@ public partial class MainWindow : Window
         string chipName = chip == RPChipType.RP2350 ? "RP2350" : "RP2040";
 
         TextBlock statusLabel;
-        Button flashButton, exportButton, exportUF2Button;
+        Button flashButton,
+            exportButton,
+            exportUF2Button;
         TabItem tab;
 
         if (chip == RPChipType.RP2350) // very high tech way to avoid repeating code lol
@@ -518,7 +527,9 @@ public partial class MainWindow : Window
 
         if (img.Width == 256 && img.Height == 256)
         {
-            AppendLog("Image is full canvas size, so enabling auto home by default.\nYou can disable it if it causes you trouble and manually home before connecting.");
+            AppendLog(
+                "Image is full canvas size, so enabling auto home by default.\nYou can disable it if it causes you trouble and manually home before connecting."
+            );
             EnableHomeCanvas.IsChecked = true;
         }
 
@@ -528,7 +539,11 @@ public partial class MainWindow : Window
         AppendLog($"Loaded image: {displayName} ({img.Width}x{img.Height})");
     }
 
-    private static SKBitmap GetPreview(SKBitmap source, QuantizerSettings quantizerSettings, string? denoiser)
+    private static SKBitmap GetPreview(
+        SKBitmap source,
+        QuantizerSettings quantizerSettings,
+        string? denoiser
+    )
     {
         var pal = new ColourPalette(new DummySink());
         return pal.PreviewColourMapping(source, quantizerSettings, denoiser);
@@ -546,7 +561,8 @@ public partial class MainWindow : Window
         var denoiser = DenoisingComboBox.SelectedItem?.ToString();
         var source = _currentImage;
 
-        var preview = await Task.Run(() => GetPreview(source, quantizerSettings, denoiser)).ConfigureAwait(true);
+        var preview = await Task.Run(() => GetPreview(source, quantizerSettings, denoiser))
+            .ConfigureAwait(true);
 
         PreviewImage.Source = ToAvaloniaBitmap(preview);
         // update the preview label to indicate the size of the image just for user reference
@@ -664,26 +680,37 @@ public partial class MainWindow : Window
             await LoadImageAsync(files[0].TryGetLocalPath() ?? "");
     }
 
-    private async void ColourMatcherComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private async void ColourMatcherComboBox_SelectionChanged(
+        object? sender,
+        SelectionChangedEventArgs e
+    )
     {
         if (_currentImage != null)
             await UpdatePreviewAsync();
         ColourLimitUpDown.IsEnabled =
             ColourMatcherComboBox?.SelectedValue?.ToString() == "Arbitrary";
 
-        if (!_loadingSettings && ColourMatcherComboBox?.SelectedItem?.ToString() is { } selectedColourMatcher)
+        if (
+            !_loadingSettings
+            && ColourMatcherComboBox?.SelectedItem?.ToString() is { } selectedColourMatcher
+        )
         {
             _currentSettings.SelectedColourMatcher = selectedColourMatcher;
             SaveSettings();
         }
     }
 
-    private async void DenoisingComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private async void DenoisingComboBox_SelectionChanged(
+        object? sender,
+        SelectionChangedEventArgs e
+    )
     {
         if (_currentImage != null)
             await UpdatePreviewAsync();
 
-        if (!_loadingSettings && DenoisingComboBox?.SelectedItem?.ToString() is { } selectedDenoiser)
+        if (
+            !_loadingSettings && DenoisingComboBox?.SelectedItem?.ToString() is { } selectedDenoiser
+        )
         {
             _currentSettings.SelectedDenoiser = selectedDenoiser;
             SaveSettings();
@@ -744,7 +771,8 @@ public partial class MainWindow : Window
         var imageSnapshot = _currentImage!.Copy();
         var drawSettings = GetDrawImageSettings();
         string quantizerName = ColourMatcherComboBox.SelectedItem!.ToString()!;
-        int? colourLimit = quantizerName == "Arbitrary" ? (int)(ColourLimitUpDown.Value ?? 32) : (int?)null;
+        int? colourLimit =
+            quantizerName == "Arbitrary" ? (int)(ColourLimitUpDown.Value ?? 32) : (int?)null;
 
         BusyExporting = true;
         exportButton.IsEnabled = false;
@@ -752,7 +780,11 @@ public partial class MainWindow : Window
         try
         {
             var (uf2Bytes, totalTime) = await GenerateUF2Async(
-                chip, imageSnapshot, drawSettings, $"Exporting to {chipName} flash");
+                chip,
+                imageSnapshot,
+                drawSettings,
+                $"Exporting to {chipName} flash"
+            );
 
             if (uf2Bytes != null && uf2Bytes.Length > 0)
             {
@@ -766,12 +798,21 @@ public partial class MainWindow : Window
                 }
             }
 
-            _ = _telemetry.ReportImage(new ImageEventDto(
-                imageWidth, imageHeight, colourCount, quantizerName, colourLimit,
-                _currentSettings.SelectedSwitchVersion.ToString(),
-                drawSettings.EnableExperimentalFeatures, totalTime.TotalSeconds, drawSettings.TSPTimeLimit,
-                GetVersionString(true), chipName
-            ));
+            _ = _telemetry.ReportImage(
+                new ImageEventDto(
+                    imageWidth,
+                    imageHeight,
+                    colourCount,
+                    quantizerName,
+                    colourLimit,
+                    _currentSettings.SelectedSwitchVersion.ToString(),
+                    drawSettings.EnableExperimentalFeatures,
+                    totalTime.TotalSeconds,
+                    drawSettings.TSPTimeLimit,
+                    GetVersionString(true),
+                    chipName
+                )
+            );
 
             SetEstimate(totalTime);
         }
@@ -792,7 +833,8 @@ public partial class MainWindow : Window
         RPChipType chip,
         SKBitmap imageSnapshot,
         DrawImageSettings drawSettings,
-        string logPrefix)
+        string logPrefix
+    )
     {
         byte[]? uf2Bytes = null;
         TimeSpan totalTime = TimeSpan.MaxValue;
@@ -859,8 +901,8 @@ public partial class MainWindow : Window
     {
         var pixels = new HashSet<SKColor>();
         for (int y = 0; y < img.Height; y++)
-            for (int x = 0; x < img.Width; x++)
-                pixels.Add(img.GetPixel(x, y));
+        for (int x = 0; x < img.Width; x++)
+            pixels.Add(img.GetPixel(x, y));
         return pixels.Count;
     }
 
@@ -881,7 +923,8 @@ public partial class MainWindow : Window
         }
 
         var chip = sender == RP2350ExportUF2Button ? RPChipType.RP2350 : RPChipType.RP2040;
-        var exportUF2Button = chip == RPChipType.RP2350 ? RP2350ExportUF2Button : RP2040ExportUF2Button;
+        var exportUF2Button =
+            chip == RPChipType.RP2350 ? RP2350ExportUF2Button : RP2040ExportUF2Button;
         var chipName = chip == RPChipType.RP2350 ? "RP2350" : "RP2040";
 
         var file = await StorageProvider.SaveFilePickerAsync(
@@ -907,7 +950,8 @@ public partial class MainWindow : Window
         var imageSnapshot = _currentImage!.Copy();
         var drawSettings = GetDrawImageSettings();
         string quantizerName = ColourMatcherComboBox.SelectedItem!.ToString()!;
-        int? colourLimit = quantizerName == "Arbitrary" ? (int)(ColourLimitUpDown.Value ?? 32) : (int?)null;
+        int? colourLimit =
+            quantizerName == "Arbitrary" ? (int)(ColourLimitUpDown.Value ?? 32) : (int?)null;
 
         exportUF2Button.IsEnabled = false;
         BusyExporting = true;
@@ -915,7 +959,11 @@ public partial class MainWindow : Window
         try
         {
             var (uf2Bytes, totalTime) = await GenerateUF2Async(
-                chip, imageSnapshot, drawSettings, "Exporting to UF2");
+                chip,
+                imageSnapshot,
+                drawSettings,
+                "Exporting to UF2"
+            );
 
             if (uf2Bytes != null && uf2Bytes.Length > 0)
             {
@@ -923,12 +971,21 @@ public partial class MainWindow : Window
                 AppendLog($"Saved UF2 to {outputPath}");
             }
 
-            _ = _telemetry.ReportImage(new ImageEventDto(
-                imageWidth, imageHeight, colourCount, quantizerName, colourLimit,
-                _currentSettings.SelectedSwitchVersion.ToString(),
-                drawSettings.EnableExperimentalFeatures, totalTime.TotalSeconds, drawSettings.TSPTimeLimit,
-                GetVersionString(true), chipName
-            ));
+            _ = _telemetry.ReportImage(
+                new ImageEventDto(
+                    imageWidth,
+                    imageHeight,
+                    colourCount,
+                    quantizerName,
+                    colourLimit,
+                    _currentSettings.SelectedSwitchVersion.ToString(),
+                    drawSettings.EnableExperimentalFeatures,
+                    totalTime.TotalSeconds,
+                    drawSettings.TSPTimeLimit,
+                    GetVersionString(true),
+                    chipName
+                )
+            );
 
             SetEstimate(totalTime);
         }
@@ -967,7 +1024,10 @@ public partial class MainWindow : Window
         }
         if (drivePath == null)
         {
-            _ = ShowMessageAsync("Error", $"{chipName} not detected. Connect it in BOOT mode first.");
+            _ = ShowMessageAsync(
+                "Error",
+                $"{chipName} not detected. Connect it in BOOT mode first."
+            );
             return;
         }
         if (!CanAccessPicoDrive(drivePath))
@@ -1066,7 +1126,10 @@ public partial class MainWindow : Window
 
     private void ThemeMenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        int index = sender == ThemeLightMenuItem ? 1 : sender == ThemeDarkMenuItem ? 2 : 0;
+        int index =
+            sender == ThemeLightMenuItem ? 1
+            : sender == ThemeDarkMenuItem ? 2
+            : 0;
         ThemeSystemMenuItem.IsChecked = index == 0;
         ThemeLightMenuItem.IsChecked = index == 1;
         ThemeDarkMenuItem.IsChecked = index == 2;
@@ -1116,7 +1179,10 @@ public partial class MainWindow : Window
             // We need to place the settings file somewhere else.
             // `~/Library/Application Support` is a common place to store app data on macOS (like `%APPDATA%` on Windows).
             // So first, ensure `~/Library/Application Support/TomodachiDrawer` exists
-            var appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TomodachiDrawer");
+            var appDataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "TomodachiDrawer"
+            );
             if (!Directory.Exists(appDataFolder))
             {
                 Directory.CreateDirectory(appDataFolder);
@@ -1133,7 +1199,10 @@ public partial class MainWindow : Window
 
     private void SaveSettings()
     {
-        var json = JsonSerializer.Serialize(_currentSettings, AppSettingsContext.Default.AppSettings);
+        var json = JsonSerializer.Serialize(
+            _currentSettings,
+            AppSettingsContext.Default.AppSettings
+        );
         File.WriteAllText(GetSettingsFilePath(), json);
     }
 
@@ -1146,7 +1215,10 @@ public partial class MainWindow : Window
             try
             {
                 var json = File.ReadAllText(settingsFilePath);
-                var settings = JsonSerializer.Deserialize(json, AppSettingsContext.Default.AppSettings);
+                var settings = JsonSerializer.Deserialize(
+                    json,
+                    AppSettingsContext.Default.AppSettings
+                );
 
                 if (settings != null)
                 {
@@ -1165,15 +1237,13 @@ public partial class MainWindow : Window
         _loadingSettings = true;
         try
         {
-            SwitchVersionComboBox.SelectedIndex =
-                (int)_currentSettings.SelectedSwitchVersion - 1;
+            SwitchVersionComboBox.SelectedIndex = (int)_currentSettings.SelectedSwitchVersion - 1;
             SetTheme(_currentSettings.SelectedThemeIndex);
             ThemeSystemMenuItem.IsChecked = _currentSettings.SelectedThemeIndex == 0;
             ThemeLightMenuItem.IsChecked = _currentSettings.SelectedThemeIndex == 1;
             ThemeDarkMenuItem.IsChecked = _currentSettings.SelectedThemeIndex == 2;
 
-            EnableExperimentalMenuItem.IsChecked =
-                _currentSettings.EnableExperimentalFeatures;
+            EnableExperimentalMenuItem.IsChecked = _currentSettings.EnableExperimentalFeatures;
             CheckForUpdatesCheckBox.IsChecked = _currentSettings.CheckForUpdatesOnStart;
 
             SelectComboBoxItem(ColourMatcherComboBox, _currentSettings.SelectedColourMatcher);
@@ -1217,7 +1287,10 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void SwitchVersionComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private async void SwitchVersionComboBox_SelectionChanged(
+        object? sender,
+        SelectionChangedEventArgs e
+    )
     {
         if (_loadingSettings)
             return;
@@ -1225,13 +1298,15 @@ public partial class MainWindow : Window
         if (SwitchVersionComboBox.SelectedIndex == 0)
         {
             _currentSettings.SelectedSwitchVersion = SwitchVersion.Switch1;
-            await ShowMessageAsync("Switch 1 Warning",
-                "Unfortunately the Switch 1 is significantly more prone to desyncing than the Switch 2." +
-                "\n\nOur leading theory as to why is that it is experiencing thermal issues whilst docked. The switch 2 by comparison has a fan in its dock, the switch 1 does not." +
-                "\nSome users have reported they could avoid the desyncs by limiting drawing to 45~ minutes or less, although the most successful method is seemingly to just undock the switch and plug the microcontroller in directly" +
-                "\nHandheld runs at 1280x720 as opposed to 1920x1080 which can reduce the power draw, and being out of the dock it can get better airflow." +
-                "\nUnfortuantely, this is still not a guarantee to avoid desyncs." +
-                "\n\nPlease keep this in mind when using the Switch 1 with this program. In a somewhat magical world, maybe Nintendo will mitigate this themselves.");
+            await ShowMessageAsync(
+                "Switch 1 Warning",
+                "Unfortunately the Switch 1 is significantly more prone to desyncing than the Switch 2."
+                    + "\n\nOur leading theory as to why is that it is experiencing thermal issues whilst docked. The switch 2 by comparison has a fan in its dock, the switch 1 does not."
+                    + "\nSome users have reported they could avoid the desyncs by limiting drawing to 45~ minutes or less, although the most successful method is seemingly to just undock the switch and plug the microcontroller in directly"
+                    + "\nHandheld runs at 1280x720 as opposed to 1920x1080 which can reduce the power draw, and being out of the dock it can get better airflow."
+                    + "\nUnfortuantely, this is still not a guarantee to avoid desyncs."
+                    + "\n\nPlease keep this in mind when using the Switch 1 with this program. In a somewhat magical world, maybe Nintendo will mitigate this themselves."
+            );
         }
         else if (SwitchVersionComboBox.SelectedIndex == 1)
             _currentSettings.SelectedSwitchVersion = SwitchVersion.Switch2;
@@ -1310,7 +1385,8 @@ public partial class MainWindow : Window
             MenuDebugConnectVirtualGamepad == null
             || MenuDebugRunInVirtualGamepad == null
             || MenuDebugOpenVirtualGamepadController == null
-        ) return;
+        )
+            return;
 
         if (!_debugVirtualGamepad.CheckDriver())
         {
@@ -1345,17 +1421,16 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrEmpty(_currentImagePath))
         {
-            _ = ShowMessageAsync(
-                "No image selected",
-                "Select an image first."
-            );
+            _ = ShowMessageAsync("No image selected", "Select an image first.");
             return;
         }
 
         var imageSnapshot = _currentImage!.Copy();
         var drawSettings = GetDrawImageSettings();
 
-        AppendLog("Starting to draw with the Virtual Gamepad. Keep focus on the window you want to draw on for the duration of the drawing.");
+        AppendLog(
+            "Starting to draw with the Virtual Gamepad. Keep focus on the window you want to draw on for the duration of the drawing."
+        );
 
         await Task.Run(async () =>
         {
@@ -1376,10 +1451,7 @@ public partial class MainWindow : Window
         if (!_debugVirtualGamepad.IsConnected)
             return;
 
-        var window = new VirtualGamepadControllerWindow
-        {
-            VirtualGamepad = _debugVirtualGamepad
-        };
+        var window = new VirtualGamepadControllerWindow { VirtualGamepad = _debugVirtualGamepad };
         window.Show(this);
     }
 #endif
@@ -1405,9 +1477,11 @@ public partial class MainWindow : Window
         Close();
     }
 
-    private async void MenuHelpOpenWelcome_Click(object? sender, RoutedEventArgs e) => await ShowWelcomeMessage();
+    private async void MenuHelpOpenWelcome_Click(object? sender, RoutedEventArgs e) =>
+        await ShowWelcomeMessage();
 
-    private void MenuHelpCheckForUpdate_Click(object? sender, RoutedEventArgs e) => _ = PerformAsyncUpdateCheck();
+    private void MenuHelpCheckForUpdate_Click(object? sender, RoutedEventArgs e) =>
+        _ = PerformAsyncUpdateCheck();
 
     private void EnableHomeCanvas_IsCheckedChanged(object? sender, RoutedEventArgs e)
     {

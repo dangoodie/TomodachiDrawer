@@ -5,12 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace TomodachiDrawer.UI.Avalonia
 {
-    internal record StartupEventDto(
-        string Os,
-        string OsVersion,
-        string Arch,
-        string AppVersion
-    );
+    internal record StartupEventDto(string Os, string OsVersion, string Arch, string AppVersion);
 
     internal record ImageEventDto(
         int ImageWidth,
@@ -44,7 +39,7 @@ namespace TomodachiDrawer.UI.Avalonia
             _http = new HttpClient
             {
                 BaseAddress = new Uri(TELEMETRY_URL),
-                Timeout = TimeSpan.FromSeconds(3)
+                Timeout = TimeSpan.FromSeconds(3),
             };
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("TomodachiDrawer");
         }
@@ -56,21 +51,26 @@ namespace TomodachiDrawer.UI.Avalonia
             if (!TelemetryEnabled)
                 return false;
 
-            string os = OperatingSystem.IsLinux() ? "Linux" :
-                OperatingSystem.IsWindows() ? "Windows" :
-                OperatingSystem.IsMacOS() ? "macOS" : "Unknown";
+            string os =
+                OperatingSystem.IsLinux() ? "Linux"
+                : OperatingSystem.IsWindows() ? "Windows"
+                : OperatingSystem.IsMacOS() ? "macOS"
+                : "Unknown";
             string osVersion = RuntimeInformation.OSDescription;
             string arch = RuntimeInformation.ProcessArchitecture.ToString();
-            var currentVersion =
-                Assembly
-                    .GetEntryAssembly()
-                    ?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion;
+            var currentVersion = Assembly
+                .GetEntryAssembly()
+                ?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
             var obj = new StartupEventDto(os, osVersion, arch, currentVersion ?? "unknown");
 
             try
             {
-                var response = await _http.PostAsJsonAsync("tomodachidrawer/startup", obj, TelemetryJsonContext.Default.StartupEventDto);
+                var response = await _http.PostAsJsonAsync(
+                    "tomodachidrawer/startup",
+                    obj,
+                    TelemetryJsonContext.Default.StartupEventDto
+                );
                 return response.IsSuccessStatusCode;
             }
             catch (Exception)
@@ -86,7 +86,11 @@ namespace TomodachiDrawer.UI.Avalonia
 
             try
             {
-                var response = await _http.PostAsJsonAsync("tomodachidrawer/image", imageData, TelemetryJsonContext.Default.ImageEventDto);
+                var response = await _http.PostAsJsonAsync(
+                    "tomodachidrawer/image",
+                    imageData,
+                    TelemetryJsonContext.Default.ImageEventDto
+                );
                 return response.IsSuccessStatusCode;
             }
             catch (Exception)

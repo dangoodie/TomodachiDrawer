@@ -1,9 +1,6 @@
 ﻿using System.Diagnostics;
-
 using Google.OrTools.ConstraintSolver;
-
 using SkiaSharp;
-
 using TomodachiDrawer.Core.ImageProcessing;
 using TomodachiDrawer.Core.ImageProcessing.Denoising;
 using TomodachiDrawer.Core.ImageProcessing.Quantizers;
@@ -327,9 +324,7 @@ namespace TomodachiDrawer.Core
                     }
                 }
             }
-            _log(
-                $"Done routing!"
-            );
+            _log($"Done routing!");
         }
 
         private static readonly int[] LargeBrushSizes = [27, 19, 13, 7, 3];
@@ -542,9 +537,9 @@ namespace TomodachiDrawer.Core
         {
             int half = brushSize / 2; // rounds down.
             for (int dy = -half; dy <= half; dy++)
-                for (int dx = -half; dx <= half; dx++)
-                    if (!map[cx + dx, cy + dy])
-                        return false;
+            for (int dx = -half; dx <= half; dx++)
+                if (!map[cx + dx, cy + dy])
+                    return false;
 
             return true;
         }
@@ -855,7 +850,10 @@ namespace TomodachiDrawer.Core
                 {
                     if (visited[j])
                         continue;
-                    int dist = Math.Max(Math.Abs(points[j].X - cur.X), Math.Abs(points[j].Y - cur.Y));
+                    int dist = Math.Max(
+                        Math.Abs(points[j].X - cur.X),
+                        Math.Abs(points[j].Y - cur.Y)
+                    );
                     if (dist < nearestDist)
                     {
                         nearestDist = dist;
