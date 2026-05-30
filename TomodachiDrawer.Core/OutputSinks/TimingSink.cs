@@ -1,6 +1,4 @@
-﻿using TomodachiDrawer.Core.Interfaces;
-
-namespace TomodachiDrawer.Core.OutputSinks
+﻿namespace TomodachiDrawer.Core.OutputSinks
 {
     /// <summary>
     /// Tracks how long all inputs fed to it would take, and records them for later replay.

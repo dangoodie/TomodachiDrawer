@@ -31,11 +31,11 @@ namespace TomodachiDrawer.SerialPlayer
             {
                 // write out the enums available
                 // Buttons and DPad
-                foreach (var button in Enum.GetValues(typeof(Button)))
+                foreach (var button in Enum.GetValues<Button>())
                 {
                     Console.WriteLine($"Button: {button} = {(int)button}");
                 }
-                foreach (var dpad in Enum.GetValues(typeof(DPad)))
+                foreach (var dpad in Enum.GetValues<DPad>())
                 {
                     Console.WriteLine($"DPad: {dpad} = {(int)dpad}");
                 }
@@ -49,7 +49,7 @@ namespace TomodachiDrawer.SerialPlayer
                     DPad? dpadButton = null;
                     Button? faceButton = null;
 
-                    foreach (var button in Enum.GetValues(typeof(Button)))
+                    foreach (var button in Enum.GetValues<Button>())
                     {
                         if (button.ToString() == input)
                         {
@@ -57,7 +57,7 @@ namespace TomodachiDrawer.SerialPlayer
                             break;
                         }
                     }
-                    foreach (var dpad in Enum.GetValues(typeof(DPad)))
+                    foreach (var dpad in Enum.GetValues<DPad>())
                     {
                         if (dpad.ToString() == input)
                         {
@@ -73,11 +73,11 @@ namespace TomodachiDrawer.SerialPlayer
                     }
 
                     controller.Tap(Button.A);
-                    controller.PreciseDelay(1000);
+                    SwitchController.PreciseDelay(1000);
                     controller.Tap(Button.A);
-                    controller.PreciseDelay(500);
+                    SwitchController.PreciseDelay(500);
                     controller.Tap(Button.A, 500);
-                    controller.PreciseDelay(1500);
+                    SwitchController.PreciseDelay(1500);
 
                     using (controller)
                     {
@@ -98,8 +98,8 @@ namespace TomodachiDrawer.SerialPlayer
                             }
 
                             int taps = 1;
-                            if (!string.IsNullOrEmpty(line))
-                                int.TryParse(line, out taps);
+                            if (!string.IsNullOrEmpty(line) && int.TryParse(line, out int parsed))
+                                taps = parsed;
 
                             for (int i = 0; i < taps; i++)
                             {
@@ -172,7 +172,7 @@ namespace TomodachiDrawer.SerialPlayer
                         case FileControllerSink.Opcode.Delay:
                             // 2-byte 12-bit record: nibble = high 4 bits, next byte = low 8 bits
                             int delayUnits = (nibble << 8) | reader.ReadByte();
-                            controller.PreciseDelay(delayUnits * DelayResMs);
+                            SwitchController.PreciseDelay(delayUnits * DelayResMs);
                             lastSingleByteRecord = null; // reset, we should never have a repeat after a delay.
                             break;
 

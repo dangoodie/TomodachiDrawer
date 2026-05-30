@@ -45,7 +45,7 @@ namespace TomodachiDrawer.SerialPlayer
         RY,
     }
 
-    public class SwitchController : IDisposable
+    public sealed class SwitchController : IDisposable
     {
         private readonly SerialPort _port;
         public bool IsConnected { get; private set; }
@@ -119,7 +119,7 @@ namespace TomodachiDrawer.SerialPlayer
         // --- Convenience Methods --- //
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void PreciseDelay(double milliseconds)
+        public static void PreciseDelay(double milliseconds)
         {
             long ticksToWait = (long)(milliseconds * Stopwatch.Frequency / 1000.0);
             long startTick = Stopwatch.GetTimestamp();

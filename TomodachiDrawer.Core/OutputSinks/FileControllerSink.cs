@@ -1,9 +1,8 @@
 ﻿using System.Text;
-using TomodachiDrawer.Core.Interfaces;
 
 namespace TomodachiDrawer.Core.OutputSinks
 {
-    public class FileControllerSink : ISwitchOutput
+    public sealed class FileControllerSink : ISwitchOutput
     {
         private const byte OpcodeDelayResolutionMs = 1;
 

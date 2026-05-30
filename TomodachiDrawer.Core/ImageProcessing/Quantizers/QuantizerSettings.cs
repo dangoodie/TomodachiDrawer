@@ -1,8 +1,8 @@
 ﻿namespace TomodachiDrawer.Core.ImageProcessing.Quantizers
 {
     public record QuantizerSettings(
-        string quantizerName,
-        int? colourCount = null,
-        bool? useDithering = null
+        string QuantizerName,
+        int? ColourCount = null,
+        bool? UseDithering = null
     );
 }

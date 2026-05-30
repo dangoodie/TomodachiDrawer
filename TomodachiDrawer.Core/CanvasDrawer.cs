@@ -1,10 +1,12 @@
 ﻿using System.Diagnostics;
+
 using Google.OrTools.ConstraintSolver;
+
 using SkiaSharp;
+
 using TomodachiDrawer.Core.ImageProcessing;
 using TomodachiDrawer.Core.ImageProcessing.Denoising;
 using TomodachiDrawer.Core.ImageProcessing.Quantizers;
-using TomodachiDrawer.Core.Interfaces;
 using TomodachiDrawer.Core.Models;
 using TomodachiDrawer.Core.OutputSinks;
 
@@ -101,7 +103,7 @@ namespace TomodachiDrawer.Core
             // First off we are just putting all the individual details into the fine detail pass,
             // following passes will start to remove from that and add to the stamp passes.
             // TODO: This doesnt really make too much sense to be in the palette class... Maybe move here?
-            var layers = _palette.BuildFineLayers(quantizedMap);
+            var layers = ColourPalette.BuildFineLayers(quantizedMap);
 
             if (settings.ReverseColourOrder)
             {

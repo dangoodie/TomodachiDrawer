@@ -39,7 +39,7 @@ public partial class MainWindow : Window
     private string _currentImagePath = string.Empty;
     private SKBitmap? _currentImage;
     private readonly CancellationTokenSource _cts = new();
-    private TelemetryService _telemetry;
+    private readonly TelemetryService _telemetry;
 
     private bool BusyExporting = false;
 
@@ -528,7 +528,7 @@ public partial class MainWindow : Window
         AppendLog($"Loaded image: {displayName} ({img.Width}x{img.Height})");
     }
 
-    private SKBitmap GetPreview(SKBitmap source, QuantizerSettings quantizerSettings, string? denoiser)
+    private static SKBitmap GetPreview(SKBitmap source, QuantizerSettings quantizerSettings, string? denoiser)
     {
         var pal = new ColourPalette(new DummySink());
         return pal.PreviewColourMapping(source, quantizerSettings, denoiser);
@@ -552,7 +552,7 @@ public partial class MainWindow : Window
         // update the preview label to indicate the size of the image just for user reference
         PreviewHeader.Text = $"Preview ({_currentImage.Width}x{_currentImage.Height})";
         AppendLog(
-            $"Updated preview for {_currentImagePath} using {quantizerSettings.quantizerName}"
+            $"Updated preview for {_currentImagePath} using {quantizerSettings.QuantizerName}"
         );
     }
 

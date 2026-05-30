@@ -1,11 +1,11 @@
 ﻿using Nefarius.ViGEm.Client.Targets;
 using Nefarius.ViGEm.Client.Targets.Xbox360;
-using TomodachiDrawer.Core.Interfaces;
-using TomodachiDrawer.DebugTools;
 
-namespace TomodachiDrawer.Core.OutputSinks
+using TomodachiDrawer.Core.OutputSinks;
+
+namespace TomodachiDrawer.DebugTools
 {
-    public class VirtualGamepadSink : ISwitchOutput
+    public sealed class VirtualGamepadSink : ISwitchOutput
     {
         private readonly IXbox360Controller _gamepad;
 

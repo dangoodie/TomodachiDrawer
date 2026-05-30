@@ -1,8 +1,6 @@
-﻿using TomodachiDrawer.Core.Interfaces;
-
-namespace TomodachiDrawer.Core.OutputSinks
+﻿namespace TomodachiDrawer.Core.OutputSinks
 {
-    public class DummySink : ISwitchOutput
+    public sealed class DummySink : ISwitchOutput
     {
         public void Delay(double milliseconds) { }
 

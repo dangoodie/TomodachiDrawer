@@ -1,6 +1,4 @@
-﻿using TomodachiDrawer.Core.OutputSinks;
-
-namespace TomodachiDrawer.Core.Interfaces
+﻿namespace TomodachiDrawer.Core.OutputSinks
 {
     public interface ISwitchOutput : IDisposable
     {
