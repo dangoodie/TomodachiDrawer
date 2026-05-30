@@ -233,7 +233,7 @@ internal static class ESP32S3Flasher
 
     // Supported board variants. Each maps to a sdkconfig.defaults.<Id> file in
     // the firmware project and a TomodachiDrawer_FW_ESP32S3-<Id>.bin produced
-    // by the build-firmware CI matrix. The bundled firmware bins only differ
+    // by the build-esp-firmware CI matrix. The bundled firmware bins only differ
     // per board for the onboard WS2812 LED GPIO - the HID gamepad behavior is
     // identical. To add a board: extend main/Kconfig.projbuild, add a
     // sdkconfig.defaults.<id>, add the id to the workflow matrix, and append
