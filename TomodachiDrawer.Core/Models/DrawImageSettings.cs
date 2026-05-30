@@ -17,5 +17,7 @@ namespace TomodachiDrawer.Core.Models
         public bool EnableExperimentalFeatures { get; set; } = false;
 
         public bool HomeToTopLeft { get; set; } = false;
+
+        public bool ReverseColourOrder { get; set; } = false;
     }
 }

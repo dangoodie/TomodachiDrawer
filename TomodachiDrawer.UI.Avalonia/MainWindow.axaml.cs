@@ -742,11 +742,7 @@ public partial class MainWindow : Window
         var imageWidth = _currentImage.Width;
         var imageHeight = _currentImage.Height;
         var imageSnapshot = _currentImage!.Copy();
-        var denoiser = DenoisingComboBox.SelectedItem?.ToString();
-        var tspLimit = (float)(TSPTimeLimitUpDown.Value ?? 0.5m);
-        var settings = GetQuantizerSettings();
-        var enableExperimental = EnableExperimentalMenuItem.IsChecked;
-        var enableHome = EnableHomeCanvas.IsChecked ?? false;
+        var drawSettings = GetDrawImageSettings();
         string quantizerName = ColourMatcherComboBox.SelectedItem!.ToString()!;
         int? colourLimit = quantizerName == "Arbitrary" ? (int)(ColourLimitUpDown.Value ?? 32) : (int?)null;
 
@@ -756,8 +752,7 @@ public partial class MainWindow : Window
         try
         {
             var (uf2Bytes, totalTime) = await GenerateUF2Async(
-                chip, imageSnapshot, settings, denoiser, tspLimit, enableExperimental, enableHome,
-                $"Exporting to {chipName} flash");
+                chip, imageSnapshot, drawSettings, $"Exporting to {chipName} flash");
 
             if (uf2Bytes != null && uf2Bytes.Length > 0)
             {
@@ -774,7 +769,7 @@ public partial class MainWindow : Window
             _ = _telemetry.ReportImage(new ImageEventDto(
                 imageWidth, imageHeight, colourCount, quantizerName, colourLimit,
                 _currentSettings.SelectedSwitchVersion.ToString(),
-                enableExperimental, totalTime.TotalSeconds, tspLimit,
+                drawSettings.EnableExperimentalFeatures, totalTime.TotalSeconds, drawSettings.TSPTimeLimit,
                 GetVersionString(true), chipName
             ));
 
@@ -796,11 +791,7 @@ public partial class MainWindow : Window
     private async Task<(byte[]? uf2Bytes, TimeSpan totalTime)> GenerateUF2Async(
         RPChipType chip,
         SKBitmap imageSnapshot,
-        QuantizerSettings settings,
-        string? denoiser,
-        float tspLimit,
-        bool enableExperimental,
-        bool homeToTopLeft,
+        DrawImageSettings drawSettings,
         string logPrefix)
     {
         byte[]? uf2Bytes = null;
@@ -823,15 +814,6 @@ public partial class MainWindow : Window
             );
             drawer.ConnectAndConfirmController();
             AppendLog("Starting to generate inputs...");
-            var drawSettings = new DrawImageSettings()
-            {
-                QuantizerSettings = settings,
-                DenoiserName = denoiser,
-                TSPTimeLimit = tspLimit,
-                DisableLargeBrush = false,
-                EnableExperimentalFeatures = enableExperimental,
-                HomeToTopLeft = homeToTopLeft,
-            };
             await drawer.DrawImage(img, drawSettings);
             AppendLog($"True complete overall time is: {timingSink.TotalTime.TotalSeconds}s");
 
@@ -859,6 +841,7 @@ public partial class MainWindow : Window
         var quantizerSettings = GetQuantizerSettings();
         var enableExperimental = EnableExperimentalMenuItem.IsChecked;
         var enableHome = EnableHomeCanvas.IsChecked ?? false;
+        var reverseColourOrder = ReverseColourOrder.IsChecked;
 
         return new()
         {
@@ -868,6 +851,7 @@ public partial class MainWindow : Window
             DisableLargeBrush = false,
             EnableExperimentalFeatures = enableExperimental,
             HomeToTopLeft = enableHome,
+            ReverseColourOrder = reverseColourOrder,
         };
     }
 
@@ -921,10 +905,7 @@ public partial class MainWindow : Window
         var imageWidth = _currentImage.Width;
         var imageHeight = _currentImage.Height;
         var imageSnapshot = _currentImage!.Copy();
-        var denoiser = DenoisingComboBox.SelectedItem?.ToString();
-        var tspLimit = (float)(TSPTimeLimitUpDown.Value ?? 0.5m);
-        var settings = GetQuantizerSettings();
-        var enableExperimental = EnableExperimentalMenuItem.IsChecked;
+        var drawSettings = GetDrawImageSettings();
         string quantizerName = ColourMatcherComboBox.SelectedItem!.ToString()!;
         int? colourLimit = quantizerName == "Arbitrary" ? (int)(ColourLimitUpDown.Value ?? 32) : (int?)null;
 
@@ -934,8 +915,7 @@ public partial class MainWindow : Window
         try
         {
             var (uf2Bytes, totalTime) = await GenerateUF2Async(
-                chip, imageSnapshot, settings, denoiser, tspLimit, enableExperimental, false,
-                "Exporting to UF2");
+                chip, imageSnapshot, drawSettings, "Exporting to UF2");
 
             if (uf2Bytes != null && uf2Bytes.Length > 0)
             {
@@ -946,7 +926,7 @@ public partial class MainWindow : Window
             _ = _telemetry.ReportImage(new ImageEventDto(
                 imageWidth, imageHeight, colourCount, quantizerName, colourLimit,
                 _currentSettings.SelectedSwitchVersion.ToString(),
-                enableExperimental, totalTime.TotalSeconds, tspLimit,
+                drawSettings.EnableExperimentalFeatures, totalTime.TotalSeconds, drawSettings.TSPTimeLimit,
                 GetVersionString(true), chipName
             ));
 
@@ -1432,4 +1412,6 @@ public partial class MainWindow : Window
         _telemetry.TelemetryEnabled = answer;
         SaveSettings();
     }
+
+    private void ReverseColourOrder_Click(object? sender, RoutedEventArgs e) { }
 }

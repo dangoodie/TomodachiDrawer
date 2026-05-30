@@ -103,6 +103,12 @@ namespace TomodachiDrawer.Core
             // TODO: This doesnt really make too much sense to be in the palette class... Maybe move here?
             var layers = _palette.BuildFineLayers(quantizedMap);
 
+            if (settings.ReverseColourOrder)
+            {
+                layers.Reverse();
+                _log("Reversed colour layer order");
+            }
+
             // If we're a full size 256x256 image, or the user just asks for it, we'll home to 0,0 on the canvas automatically.
             if (settings.HomeToTopLeft)
             {

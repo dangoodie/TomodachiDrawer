@@ -54,6 +54,13 @@
 				Header="_Open Telemetry Prompt"
 				Click="OpenTelemetryPrompt_Click"
 				/>
+				<MenuItem
+				x:Name="ReverseColourOrder"
+				Header="_Reverse Colour Order"
+				ToolTip.Tip="Reverses the order the program processess colours in. This is mostly intended as a bandaid for Switch 1 users to try and complete drawings that desync. This may not be 100% consistent, unless you use the exact same settings."
+				ToggleType="CheckBox"
+				Click="ReverseColourOrder_Click"
+				/>
 			</MenuItem>
 			<MenuItem Header="_Templates" x:Name="MenuTemplates">
 				<!-- Inserted at runtime -->
