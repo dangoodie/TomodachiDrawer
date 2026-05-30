@@ -32,7 +32,7 @@ jobs:
       run: dotnet build --configuration ${{ matrix.configuration }} --no-restore
     - name: Test
       run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal /p:EnableWindowsTargeting=true
-  build-firmware:
+  build-esp-firmware:
     name: Build ESP32-S3 firmware (${{ matrix.board }})
     runs-on: ubuntu-latest
     strategy:
@@ -90,7 +90,7 @@ jobs:
 
   publish-avalonia:
     runs-on: ubuntu-latest
-    needs: [build, build-firmware]
+    needs: [build, build-esp-firmware]
     strategy:
       fail-fast: false
       matrix:
