@@ -149,6 +149,9 @@ namespace TomodachiDrawer.Core
                     _log(
                         $"\tUsing bucket to fill most prevalent colour: {bucketColour.Value.DisplayName}"
                     );
+
+                    _toolbar.ClearCanvas();
+
                     _toolbar.SelectBucket();
                     _palette.SelectColour(bucketColour.Value, 25.0);
                     _realOutput.Tap(Button.A);
@@ -531,11 +534,9 @@ namespace TomodachiDrawer.Core
         {
             int half = brushSize / 2; // rounds down.
             for (int dy = -half; dy <= half; dy++)
-            {
                 for (int dx = -half; dx <= half; dx++)
                     if (!map[cx + dx, cy + dy])
                         return false;
-            }
 
             return true;
         }

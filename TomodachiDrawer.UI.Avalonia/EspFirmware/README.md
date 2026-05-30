@@ -12,7 +12,7 @@ Expected contents:
 
 The binaries themselves are not committed. They get here two ways:
 
-- **CI**: the `build-firmware` job in `.github/workflows/dotnet-build.yml` runs `espressif/esp-idf-ci-action` against the firmware project and downloads the resulting bins into this folder before `dotnet publish`.
+- **CI**: the `build-esp-firmware` job in `.github/workflows/dotnet-build.yml` runs `espressif/esp-idf-ci-action` against the firmware project and downloads the resulting bins into this folder before `dotnet publish`.
 - **Local dev**: an MSBuild target in the .csproj copies the bins from `../TomodachiDrawer.Firmware.ESP32S3/build/` if they exist there (i.e. if you've run `idf.py build` on the firmware project).
 
 If this folder is empty when the app starts, the "Flash Base Firmware (ESP32-S3)" button stays disabled.

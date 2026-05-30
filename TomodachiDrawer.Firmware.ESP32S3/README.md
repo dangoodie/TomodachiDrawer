@@ -46,4 +46,3 @@ Hardware functions of the buttons (BOOT-hold-during-reset = ROM download mode, R
 | `main/idf_component.yml` | Managed component deps (`led_strip`, `esp_tinyusb`) |
 | `partitions.csv` | Factory app + custom `tdld` data partition |
 | `sdkconfig.defaults` | Committed build-time defaults |
-| `tools/` | Standalone helpers for testing and bridging (see [tools/README.md](tools/README.md) once created, or read the docstrings) |
