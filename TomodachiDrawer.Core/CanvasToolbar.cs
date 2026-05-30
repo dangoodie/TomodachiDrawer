@@ -22,6 +22,7 @@ namespace TomodachiDrawer.Core
         private const int ToolbarSelectIndex = 3; // Used for canvas homing.
         private const int ToolbarBucketIndex = 7;
         private const int ToolbarBrushIndex = 8;
+        private const int ToolbarEraserIndex = 9;
         private const int ToolbarItemCount = 12;
 
         private int _toolbarCurrentIndex = -1;
@@ -34,6 +35,12 @@ namespace TomodachiDrawer.Core
         private const int BucketSubmenuColumns = 7;
         private const int BucketSubmenuRows = 2;
         private bool _bucketSubmenuHomed = false;
+
+        // Eraser
+        private const int EraserSubmenuColumns = 6;
+        private const int EraserSubmenuRows = 6;
+        private const int EraserSubmenuEraseAllRow = 4; // NOTE: Erase all jumps to ToolbarBrushIndex after use!
+        
 
         private int _lastBrushColumn = -1; // Brush menu remains on the previous
 
@@ -152,8 +159,15 @@ namespace TomodachiDrawer.Core
 
                 // Go to the square brush area, at the 1 pixel brush.
                 output.Tap(DPad.DOWN);
+                for (int i = 0; i < 5; i++)
+                    output.Tap(DPad.RIGHT);
+                output.Tap(Button.A); // Select a brush that we dont actually use so we KNOW we will need two A presses. avoids a accidental click through draw
+                output.Delay(350);
+                for (int i = 0; i < 5; i++)
+                    output.Tap(DPad.LEFT);
                 output.Tap(DPad.DOWN);
                 currentColumn = 0;
+                output.Delay(100);
             }
 
             // After
@@ -173,7 +187,7 @@ namespace TomodachiDrawer.Core
             if (needsTwoTaps)
             {
                 output.Tap(Button.A, 50, 25); // Switch 1 seems to want the press to last longer oddly. Hold for 50ms instead of 25.
-                output.Delay(500);
+                output.Delay(350);
             }
             // Close
             output.Tap(Button.A, 50, 25);
@@ -201,7 +215,7 @@ namespace TomodachiDrawer.Core
                 // 7 wide 2 tall
                 for (int i = 0; i < BucketSubmenuRows - 1; i++)
                     output.Tap(DPad.UP);
-                for (int i = 0; i < BucketSubmenuRows - 1; i++)
+                for (int i = 0; i < BucketSubmenuColumns - 1; i++)
                     output.Tap(DPad.LEFT);
 
                 _bucketSubmenuHomed = true;
@@ -211,6 +225,34 @@ namespace TomodachiDrawer.Core
             // so only one A press ever needed.
             output.Tap(Button.A, 50, 25);
             output.Delay(500);
+        }
+
+        public void ClearCanvas() => ClearCanvas(_realOutput);
+
+        public void ClearCanvas(ISwitchOutput output)
+        {
+            output.Tap(Button.X);
+            output.Delay(500);
+
+            GoToToolbarIndex(output, ToolbarEraserIndex);
+
+            output.Tap(Button.X, 50, 25); // Open Eraser submenu
+            output.Delay(400);
+            // slam to the top left
+            for (int i = 0; i < EraserSubmenuColumns - 1; i++)
+                output.Tap(DPad.LEFT);
+            for (int i = 0; i < EraserSubmenuRows - 1; i++)
+                output.Tap(DPad.UP);
+
+            // Go down to the Erase All Button. Appears to be accessible from any row, could probably remove the column homing
+            for (int i = 0; i < EraserSubmenuEraseAllRow - 1; i++)
+                output.Tap(DPad.DOWN);
+
+            // Perform clear
+            output.Tap(Button.A, 50, 25);
+            output.Delay(500);
+            // After performing the Erase All the game automatically selects the brush so.
+            _toolbarCurrentIndex = ToolbarBrushIndex;
         }
     }
 }

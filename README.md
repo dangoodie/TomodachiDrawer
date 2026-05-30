@@ -3,7 +3,12 @@
 TomodachiDrawer is a collection of firmware and software that generates inputs to control a Nintendo Switch to draw arbitrary images in the Palette House.
 
 ## WARNING: Switch 1 is prone to desyncs
-See #12 , unfortunately it seems that the Switch 1 is prone to desyncing randomly from inexplicable lag spikes. Current testing suggests this is related to the 3D preview. Switch 2 users are unaffected, and drawings of types that are just lone transparent images do not seem to be prone to these effects. 0.3.1 and 0.3.2 added some mitigations for some other types of delay, but the lag one is still under investigation. If you have any information or clips of the desync occuring, be sure to comment it on that issue!
+See #12 , unfortunately it seems that the Switch 1 is prone to desyncing randomly from inexplicable lag spikes.
+Our testing seems to suggest this is partially due to the 3D preview causing the lag, but even with drawings with non-3d previews, it can still desync for longer drawings.
+The best way to make it work is to create stamps and do one corner at a time and then combine it at the end. This is, understandably, quite annoying. But the alternative is slowing the program down by 10x turning a 2 hour drawing into 20 hours, which is not exactly realistic.
+If you figure out an alternative way to avoid the lag, please open an issue!
+
+**Update as of 2026-05-28:** Per [#97](https://github.com/Lucas7yoshi/TomodachiDrawer/issues/97) this may be partially induced by playing in docked mode. You *can* draw in handheld mode, however you are then limited by battery life. The game running at 1080p, plus being in the dock which does not have any active fan (unlike the Switch 2) may be causing thermal issues that induce the lag. Worth trying if you are limited to the Switch 1.
 
 <img src="Docs/baconator_preview.webp" width="600" alt="Tomodachi Drawer drawing a Baconator">
 <img src="Docs/nurture_preview.webp" width="600" alt="Tomodachi Drawer drawing the Porter Robinson album art for Nurture">
@@ -15,6 +20,8 @@ It has a crossplatform Avalonia UI desktop app that supports flashing directly t
 ## Hardware Compatibility
 This was designed for an RP2040-Zero as it was one of the cheapest options, however any RP2040 based board *should* be compatible, with support for the LED on the standard Raspberry Pi Pico too.
 
+As of 0.6.0 the program is also compatibile with RP2350 based boards, such as the RP2350-Zero or the Raspberry Pi Pico 2 or 2W
+
 ESP32-S3 boards are also supported. The recommended board is the Waveshare ESP32-S3-Zero - same physical form factor as the RP2040-Zero and onboard WS2812. Other tested S3 boards (Espressif DevKitC-1 in both LED-rev variants, DevKitM-1, Adafruit QT Py ESP32-S3, Lolin S3 Mini, M5Stack AtomS3) ship pre-built in the release - just pick yours from the "Board" dropdown on the ESP32-S3 tab before flashing. The board choice only affects which GPIO the firmware drives for the status LED; everything else is identical. For unlisted boards you can build a custom firmware via `idf.py menuconfig` - see [TomodachiDrawer.Firmware.ESP32S3/README.md](TomodachiDrawer.Firmware.ESP32S3/README.md). Note that this needs an ESP32-S3 specifically - the original ESP32, ESP32-C3/C6/H2 lack the USB-OTG peripheral required to enumerate as a Switch controller.
 
 One UX wrinkle for the single-port S3 boards (S3-Zero, QT Py S3, AtomS3, etc): once the firmware is running it's pretending to be a Switch controller on that one USB-C port, so esptool can't reach it any more. To re-flash a drawing you have to put the chip back into ROM bootloader mode first - hold BOOT while plugging into the PC (or hold BOOT and tap RST if the board has both buttons). Boards with two USB-C ports (DevKitC-1, DevKitM-1) don't have this problem because their second port is a separate USB-UART bridge that esptool can always reach. If you'll be iterating on drawings a lot, the dual-port boards are friendlier.
@@ -25,11 +32,7 @@ Initial setup requires a few steps, made easier by the UI.
 
 ### Following the YouTube tutorial is recommended:
 
-Note: flashing lights warning for video, apologies.
-[YouTube Tutorial](https://youtu.be/GIaiw3gzabo)
-
-An addendum video covering the changes since that was made is available here:
-[Addendum Tutorial](https://youtu.be/9rVLea1-nlY)
+[Updated TomodachiDrawer Tutorial](https://youtu.be/5rxu7hX95O8) 
 
 ### Downloads
 Downloads are available in the releases, they come in a few forms
@@ -40,7 +43,9 @@ Downloads are available in the releases, they come in a few forms
 platform can be win64 for windows, osx-arm64 for Mac on ARM cpus, osx64 for Mac on x64 cpus, and linux64 and linuxarm64 for the same on linux.
 Download the one that is right for your computer, for mac users with any recent macbook arm64 should work.
 
-For Linux and Mac users, you may need to run chmod +x binaryNameHere or go into your settings to allow it.
+For Linux users you will need to MAY need to run chmod +x to make the executable... executable.
+
+For mac users, there is some important steps to follow to make the program runnable included in a txt file with the program.
 
 ### Or briefly, in text:
 
@@ -57,7 +62,7 @@ For Linux and Mac users, you may need to run chmod +x binaryNameHere or go into 
     - Note: you must have Palette house open, on "pro" mode, the cursor in the top left of where you want it drawn, zoomed out, and your top colour to be set to black.
 12. Upon completion, the RGB LED on the Pi will go to a rainbow. If you disconnect it and reconnect it, it will draw it again. Connect to your PC to change the image!
 
-#### If the program does not recognize your RP2040
+#### If the program does not recognize your RP2040/RP2350
 The logic may be delicate for Linux and Mac platforms as those are ones I cannot test.
 If it does not detect it, you can still drag-and-drop the .uf2 included with the download to your Pi for step 7, and for the image data, select "export .uf2" and save it to a destination, and once done, drag and drop onto the RP2040 drive to flash it manually.
 
@@ -97,7 +102,7 @@ This project depends on the following libraries:
 
 - SkiaSharp	(For image reading/writing)
 - Google.OrTools (for the TSP solving)
-- ImageSharp (For its WuQuantizer)
+- JeremyAnsel.ColorQuant (For its WuQuantizer)
 - System.IO.Ports (for ESP32-S3 serial port enumeration in the UI)
 
 The ESP32-S3 firmware (TomodachiDrawer.Firmware.ESP32S3) additionally uses:

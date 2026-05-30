@@ -12,10 +12,10 @@
     <NoWarn>$(NoWarn);IL2104</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.0.3" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
+    <PackageReference Include="Avalonia" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
     <!-- SerialPort APIs for ESP32-S3 board detection (not in netcore base). -->
     <PackageReference Include="System.IO.Ports" Version="10.0.0" />
   </ItemGroup>
@@ -68,6 +68,7 @@
   </Target>
   <ItemGroup>
     <ProjectReference Include="..\TomodachiDrawer.Core\TomodachiDrawer.Core.csproj" />
+    <ProjectReference Condition="'$(Configuration)' == 'Debug'" Include="..\TomodachiDrawer.DebugTools\TomodachiDrawer.DebugTools.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!-- publish trimming thing-->
@@ -81,7 +82,7 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="TomodachiDrawer.Firmware.uf2">
+    <None Update="TomodachiDrawer.Firmware.*.uf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -120,13 +121,14 @@
       <ResourcesDir>$([System.IO.Path]::Combine('$(ContentsDir)', 'Resources'))</ResourcesDir>
     </PropertyGroup>
     <ItemGroup>
-      <PublishFiles Include="$(PublishDir)**\*.*" Exclude="$(AppBundleDir)\**\*.*;$(PublishDir)TomodachiDrawer.Firmware.uf2" />
+      <FirmwareFiles Include="$(PublishDir)TomodachiDrawer.Firmware.*.uf2" />
+      <PublishFiles Include="$(PublishDir)**\*.*" Exclude="$(AppBundleDir)\**\*.*;$(PublishDir)TomodachiDrawer.Firmware.*.uf2" />
     </ItemGroup>
     <MakeDir Directories="$(AppBundleDir);$(ContentsDir);$(MacOsDir);$(ResourcesDir)" />
     <Move SourceFiles="@(PublishFiles)" DestinationFolder="$(MacOsDir)\%(RecursiveDir)" />
-    <Copy SourceFiles="$(PublishDir)TomodachiDrawer.Firmware.uf2" DestinationFolder="$(MacOsDir)" />
+    <Copy SourceFiles="@(FirmwareFiles)" DestinationFolder="$(MacOsDir)" />
     <Copy SourceFiles="$(ProjectDir)Packaging/macOS/AppIcon.icns" DestinationFolder="$(ResourcesDir)" />
-    <Copy SourceFiles="$(ProjectDir)Packaging/macOS/README.txt" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="$(ProjectDir)Packaging/macOS/MAC_USER_MUST_README-IMPORTANT.txt" DestinationFolder="$(PublishDir)" />
     <PropertyGroup>
       <PlistSource>$(ProjectDir)Packaging/macOS/Info.plist</PlistSource>
       <PlistDestination>$([System.IO.Path]::Combine('$(ContentsDir)', 'Info.plist'))</PlistDestination>
