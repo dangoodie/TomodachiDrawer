@@ -98,6 +98,18 @@ jobs:
       IDF_VERSION: v6.0
     steps:
     - uses: actions/checkout@v6
+    - name: Free up disk space
+      # The ESP-IDF docker image is ~5GB and ubuntu-latest only ships ~14GB
+      # free. We've seen intermittent "no space left on device" failures during
+      # docker load when the runner happens to ship with more preinstalled
+      # cruft than usual. Evicting the toolchains we don't use buys ~25GB.
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+        df -h
     - name: Restore cached ESP-IDF docker image
       id: idf-docker-cache
       uses: actions/cache@v4
