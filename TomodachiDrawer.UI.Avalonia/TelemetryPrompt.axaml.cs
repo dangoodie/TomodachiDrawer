@@ -21,7 +21,11 @@ public partial class TelemetryPrompt : Window
 
     private void OpenSourceButton_Click(object? sender, RoutedEventArgs e)
     {
-        Launcher.LaunchUriAsync(new Uri("https://github.com/Lucas7yoshi/TomodachiDrawer/blob/master/TomodachiDrawer.UI.Avalonia/TelemetryService.cs"));
+        Launcher.LaunchUriAsync(
+            new Uri(
+                "https://github.com/Lucas7yoshi/TomodachiDrawer/blob/master/TomodachiDrawer.UI.Avalonia/TelemetryService.cs"
+            )
+        );
     }
 
     private void NoThanksButton_Click(object? sender, RoutedEventArgs e)

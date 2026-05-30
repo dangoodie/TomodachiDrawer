@@ -10,7 +10,7 @@ namespace TomodachiDrawer.Core.ImageProcessing
         byte B,
         int? GridX,
         int? GridY,
-        SKColor skColor,
+        SKColor SkColor,
         bool IsArbitrary = false
     )
     {

@@ -16,7 +16,7 @@ namespace TomodachiDrawer.Core.Models
         /// be quicker than 6 1x1 points.
         /// Key is stamp size, value is the list of points. Should be TSP solved.
         /// </summary>
-        public Dictionary<int, List<CanvasPoint>> StampsBySize = new();
+        public Dictionary<int, List<CanvasPoint>> StampsBySize = [];
 
         /// <summary>1x1 points for individual drawing.</summary>
         public HashSet<CanvasPoint> FineDetailPoints = [];

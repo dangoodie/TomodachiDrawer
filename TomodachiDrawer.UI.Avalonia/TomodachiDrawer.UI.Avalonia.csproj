@@ -8,7 +8,7 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <Version>0.0.0</Version>
     <ApplicationIcon>TomodachiDrawer.ico</ApplicationIcon>
-	<!-- suppress warning from Google.OrTools from trimming since we are rooting it. -->
+    <!-- suppress warning from Google.OrTools from trimming since we are rooting it. -->
     <NoWarn>$(NoWarn);IL2104</NoWarn>
   </PropertyGroup>
   <ItemGroup>
@@ -18,6 +18,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
     <!-- SerialPort APIs for ESP32-S3 board detection (not in netcore base). -->
     <PackageReference Include="System.IO.Ports" Version="10.0.0" />
+    <PackageReference Include="Sentry" Version="6.6.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Bundled esptool binaries for ESP32-S3 flashing. CI downloads these
@@ -68,7 +69,10 @@
   </Target>
   <ItemGroup>
     <ProjectReference Include="..\TomodachiDrawer.Core\TomodachiDrawer.Core.csproj" />
-    <ProjectReference Condition="'$(Configuration)' == 'Debug'" Include="..\TomodachiDrawer.DebugTools\TomodachiDrawer.DebugTools.csproj" />
+    <ProjectReference
+      Condition="'$(Configuration)' == 'Debug'"
+      Include="..\TomodachiDrawer.DebugTools\TomodachiDrawer.DebugTools.csproj"
+    />
   </ItemGroup>
   <ItemGroup>
     <!-- publish trimming thing-->
@@ -81,6 +85,19 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != '' And !$(RuntimeIdentifier.StartsWith('osx'))">
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- Compression saves 60%~ -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('osx'))">
+    <BundleMacOSApp>true</BundleMacOSApp>
+  </PropertyGroup>
   <ItemGroup>
     <None Update="TomodachiDrawer.Firmware.*.uf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -111,9 +128,13 @@
     <UseAppHost>true</UseAppHost>
     <PublishSingleFile>false</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>false</IncludeNativeLibrariesForSelfExtract>
-	<PublishTrimmed>true</PublishTrimmed>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
-  <Target Name="BundleMacOS" AfterTargets="Publish" Condition="'$(BundleMacOSApp)' == 'true' And $(RuntimeIdentifier.StartsWith('osx'))">
+  <Target
+    Name="BundleMacOS"
+    AfterTargets="Publish"
+    Condition="'$(BundleMacOSApp)' == 'true' And $(RuntimeIdentifier.StartsWith('osx'))"
+  >
     <PropertyGroup>
       <AppBundleDir>$([System.IO.Path]::Combine('$(PublishDir)', 'TomodachiDrawer.app'))</AppBundleDir>
       <ContentsDir>$([System.IO.Path]::Combine('$(AppBundleDir)', 'Contents'))</ContentsDir>
@@ -122,13 +143,22 @@
     </PropertyGroup>
     <ItemGroup>
       <FirmwareFiles Include="$(PublishDir)TomodachiDrawer.Firmware.*.uf2" />
-      <PublishFiles Include="$(PublishDir)**\*.*" Exclude="$(AppBundleDir)\**\*.*;$(PublishDir)TomodachiDrawer.Firmware.*.uf2" />
+      <PublishFiles
+        Include="$(PublishDir)**\*.*"
+        Exclude="$(AppBundleDir)\**\*.*;$(PublishDir)TomodachiDrawer.Firmware.*.uf2"
+      />
     </ItemGroup>
     <MakeDir Directories="$(AppBundleDir);$(ContentsDir);$(MacOsDir);$(ResourcesDir)" />
     <Move SourceFiles="@(PublishFiles)" DestinationFolder="$(MacOsDir)\%(RecursiveDir)" />
     <Copy SourceFiles="@(FirmwareFiles)" DestinationFolder="$(MacOsDir)" />
-    <Copy SourceFiles="$(ProjectDir)Packaging/macOS/AppIcon.icns" DestinationFolder="$(ResourcesDir)" />
-    <Copy SourceFiles="$(ProjectDir)Packaging/macOS/MAC_USER_MUST_README-IMPORTANT.txt" DestinationFolder="$(PublishDir)" />
+    <Copy
+      SourceFiles="$(ProjectDir)Packaging/macOS/AppIcon.icns"
+      DestinationFolder="$(ResourcesDir)"
+    />
+    <Copy
+      SourceFiles="$(ProjectDir)Packaging/macOS/MAC_USER_MUST_README-IMPORTANT.txt"
+      DestinationFolder="$(PublishDir)"
+    />
     <PropertyGroup>
       <PlistSource>$(ProjectDir)Packaging/macOS/Info.plist</PlistSource>
       <PlistDestination>$([System.IO.Path]::Combine('$(ContentsDir)', 'Info.plist'))</PlistDestination>

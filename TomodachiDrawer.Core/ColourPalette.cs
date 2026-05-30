@@ -1,15 +1,13 @@
 ﻿using SkiaSharp;
-
 using TomodachiDrawer.Core.ImageProcessing;
 using TomodachiDrawer.Core.ImageProcessing.Denoising;
 using TomodachiDrawer.Core.ImageProcessing.Quantizers;
-using TomodachiDrawer.Core.Interfaces;
 using TomodachiDrawer.Core.Models;
 using TomodachiDrawer.Core.OutputSinks;
 
 namespace TomodachiDrawer.Core
 {
-    public class ColourPalette
+    public class ColourPalette(ISwitchOutput outputSink)
     {
         // in game stuff
         private const int GridWidth = 12;
@@ -27,7 +25,7 @@ namespace TomodachiDrawer.Core
 
         private bool _hotbarHomed = false; // If not, we home on first colour set.
 
-        private ISwitchOutput _realOutput;
+        private readonly ISwitchOutput _realOutput = outputSink;
 
         public static readonly Dictionary<
             string,
@@ -137,11 +135,6 @@ namespace TomodachiDrawer.Core
             C("Pink", "#FF00C3", 11, 6),
         ];
 
-        public ColourPalette(ISwitchOutput outputSink)
-        {
-            _realOutput = outputSink;
-        }
-
         // Helper function that takes in an image and returns a preview of it
         // ran through the IImageQuantizer of their choosing.
         public SKBitmap PreviewColourMapping(
@@ -150,7 +143,7 @@ namespace TomodachiDrawer.Core
             string? denoiserName
         )
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(quantizerSettings.quantizerName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(quantizerSettings.QuantizerName);
             ArgumentNullException.ThrowIfNull(source);
 
             var trueSource = source;
@@ -170,7 +163,7 @@ namespace TomodachiDrawer.Core
                     var paletteColour = quantized[x, y];
                     if (paletteColour != null)
                     {
-                        output.SetPixel(x, y, paletteColour.Value.skColor);
+                        output.SetPixel(x, y, paletteColour.Value.SkColor);
                     }
                 }
             }
@@ -185,17 +178,17 @@ namespace TomodachiDrawer.Core
             int width = source.Width,
                 height = source.Height;
 
-            if (quantizerSettings.quantizerName == "Arbitrary")
+            if (quantizerSettings.QuantizerName == "Arbitrary")
             {
-                if (quantizerSettings.colourCount == null)
+                if (quantizerSettings.ColourCount == null)
                     throw new ArgumentNullException(
-                        nameof(quantizerSettings.colourCount),
+                        nameof(quantizerSettings),
                         "colourCount must be set for Arbitrary quantizer"
                     );
 
                 SKBitmap quantized = ArbitraryColourQuantizer.Quantize(
                     source,
-                    (int)quantizerSettings.colourCount
+                    (int)quantizerSettings.ColourCount
                 );
                 SKColor[] pixels = quantized.Pixels;
 
@@ -228,7 +221,7 @@ namespace TomodachiDrawer.Core
             }
             else
             {
-                var quantizer = Quantizers[quantizerSettings.quantizerName](Colours);
+                var quantizer = Quantizers[quantizerSettings.QuantizerName](Colours);
                 SKColor[] pixels = source.Pixels;
 
                 var result = new PaletteColour?[width, height];
@@ -249,7 +242,7 @@ namespace TomodachiDrawer.Core
         /// <summary>Creates the ColourLayers for each colour in a quantized image. Puts all pixels into FineDetailPoints for solving later</summary>
         /// <param name="pixels">The Quantized image</param>
         /// <returns>ColourLayers with FineDetails populated with all the points.</returns>
-        public List<ColourLayer> BuildFineLayers(PaletteColour?[,] pixels)
+        public static List<ColourLayer> BuildFineLayers(PaletteColour?[,] pixels)
         {
             var distinctColours = pixels.OfType<PaletteColour>().Distinct().ToList();
 
@@ -344,13 +337,15 @@ namespace TomodachiDrawer.Core
                 }
 
                 // Figure out the steps first off
-                var steps = ColourPickerRouter.FromColour(target.skColor);
+                var (HueSteps, SatSteps, ValSteps) = ColourPickerRouter.FromColour(target.SkColor);
 
                 // Determine which way we home for shorter travel.
                 // If we are past the halfway point, use the opposite side.
-                bool hueHomeLeft = steps.HueSteps <= (ColourPickerRouter.FCR_HUE_SLIDER_STEP_COUNT - 1) / 2;
-                bool satHomeRight = steps.SatSteps <= (ColourPickerRouter.FCR_SATURATION_STEP_COUNT - 1) / 2;
-                bool valHomeTop = steps.ValSteps <= (ColourPickerRouter.FCR_VALUE_STEP_COUNT - 1) / 2;
+                bool hueHomeLeft =
+                    HueSteps <= (ColourPickerRouter.FCR_HUE_SLIDER_STEP_COUNT - 1) / 2;
+                bool satHomeRight =
+                    SatSteps <= (ColourPickerRouter.FCR_SATURATION_STEP_COUNT - 1) / 2;
+                bool valHomeTop = ValSteps <= (ColourPickerRouter.FCR_VALUE_STEP_COUNT - 1) / 2;
 
                 // Use stick for quicker homing
                 _realOutput.SetStick(Stick.LX, satHomeRight ? (byte)255 : (byte)0);
@@ -370,18 +365,18 @@ namespace TomodachiDrawer.Core
                 // to avoid the inherent delays of .Tap, this would negate compression savings of .Tap
                 // but for colour selection it would be fairly insignificant.
                 int hueInputs = hueHomeLeft
-                    ? steps.HueSteps
-                    : (ColourPickerRouter.FCR_HUE_SLIDER_STEP_COUNT - 1) - steps.HueSteps;
+                    ? HueSteps
+                    : (ColourPickerRouter.FCR_HUE_SLIDER_STEP_COUNT - 1) - HueSteps;
                 Button hueTapDirection = hueHomeLeft ? Button.ZR : Button.ZL;
 
                 int satInputs = satHomeRight
-                    ? steps.SatSteps
-                    : (ColourPickerRouter.FCR_SATURATION_STEP_COUNT - 1) - steps.SatSteps;
+                    ? SatSteps
+                    : (ColourPickerRouter.FCR_SATURATION_STEP_COUNT - 1) - SatSteps;
                 DPad satDirection = satHomeRight ? DPad.LEFT : DPad.RIGHT;
 
                 int valInputs = valHomeTop
-                    ? steps.ValSteps
-                    : (ColourPickerRouter.FCR_VALUE_STEP_COUNT - 1) - steps.ValSteps;
+                    ? ValSteps
+                    : (ColourPickerRouter.FCR_VALUE_STEP_COUNT - 1) - ValSteps;
                 DPad valDirection = valHomeTop ? DPad.DOWN : DPad.UP;
 
                 for (int i = 0; i < hueInputs; i++)

@@ -1,6 +1,4 @@
-﻿using TomodachiDrawer.Core.Interfaces;
-
-namespace TomodachiDrawer.Core.OutputSinks
+﻿namespace TomodachiDrawer.Core.OutputSinks
 {
     /// <summary>
     /// Tracks how long all inputs fed to it would take, and records them for later replay.
@@ -75,7 +73,12 @@ namespace TomodachiDrawer.Core.OutputSinks
             Delay(releaseDuration);
         }
 
-        void ISwitchOutput.TapStick(Stick stick, byte value, double holdDuration, double releaseDuration)
+        void ISwitchOutput.TapStick(
+            Stick stick,
+            byte value,
+            double holdDuration,
+            double releaseDuration
+        )
         {
             _totalMilliseconds += holdDuration + releaseDuration;
             _actions.Add(o => o.TapStick(stick, value, holdDuration, releaseDuration));

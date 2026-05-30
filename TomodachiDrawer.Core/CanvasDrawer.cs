@@ -4,7 +4,6 @@ using SkiaSharp;
 using TomodachiDrawer.Core.ImageProcessing;
 using TomodachiDrawer.Core.ImageProcessing.Denoising;
 using TomodachiDrawer.Core.ImageProcessing.Quantizers;
-using TomodachiDrawer.Core.Interfaces;
 using TomodachiDrawer.Core.Models;
 using TomodachiDrawer.Core.OutputSinks;
 
@@ -101,7 +100,13 @@ namespace TomodachiDrawer.Core
             // First off we are just putting all the individual details into the fine detail pass,
             // following passes will start to remove from that and add to the stamp passes.
             // TODO: This doesnt really make too much sense to be in the palette class... Maybe move here?
-            var layers = _palette.BuildFineLayers(quantizedMap);
+            var layers = ColourPalette.BuildFineLayers(quantizedMap);
+
+            if (settings.ReverseColourOrder)
+            {
+                layers.Reverse();
+                _log("Reversed colour layer order");
+            }
 
             // If we're a full size 256x256 image, or the user just asks for it, we'll home to 0,0 on the canvas automatically.
             if (settings.HomeToTopLeft)
@@ -319,9 +324,7 @@ namespace TomodachiDrawer.Core
                     }
                 }
             }
-            _log(
-                $"Done routing!"
-            );
+            _log($"Done routing!");
         }
 
         private static readonly int[] LargeBrushSizes = [27, 19, 13, 7, 3];
@@ -534,9 +537,9 @@ namespace TomodachiDrawer.Core
         {
             int half = brushSize / 2; // rounds down.
             for (int dy = -half; dy <= half; dy++)
-                for (int dx = -half; dx <= half; dx++)
-                    if (!map[cx + dx, cy + dy])
-                        return false;
+            for (int dx = -half; dx <= half; dx++)
+                if (!map[cx + dx, cy + dy])
+                    return false;
 
             return true;
         }
@@ -847,7 +850,10 @@ namespace TomodachiDrawer.Core
                 {
                     if (visited[j])
                         continue;
-                    int dist = Math.Max(Math.Abs(points[j].X - cur.X), Math.Abs(points[j].Y - cur.Y));
+                    int dist = Math.Max(
+                        Math.Abs(points[j].X - cur.X),
+                        Math.Abs(points[j].Y - cur.Y)
+                    );
                     if (dist < nearestDist)
                     {
                         nearestDist = dist;

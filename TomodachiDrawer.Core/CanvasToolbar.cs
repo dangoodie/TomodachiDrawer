@@ -1,5 +1,4 @@
-﻿using TomodachiDrawer.Core.Interfaces;
-using TomodachiDrawer.Core.OutputSinks;
+﻿using TomodachiDrawer.Core.OutputSinks;
 
 namespace TomodachiDrawer.Core
 {
@@ -40,7 +39,6 @@ namespace TomodachiDrawer.Core
         private const int EraserSubmenuColumns = 6;
         private const int EraserSubmenuRows = 6;
         private const int EraserSubmenuEraseAllRow = 4; // NOTE: Erase all jumps to ToolbarBrushIndex after use!
-        
 
         private int _lastBrushColumn = -1; // Brush menu remains on the previous
 
@@ -91,12 +89,11 @@ namespace TomodachiDrawer.Core
             output.ReleaseAll();
             output.Delay(75);
 
-
             // Open toolbar
             output.Tap(Button.X);
             output.Delay(500);
 
-            GoToToolbarIndex(output, ToolbarSelectIndex); // Move is closest to the the 
+            GoToToolbarIndex(output, ToolbarSelectIndex); // Move is closest to the the
 
             // 7 down 16 right
             const int downCount = 7;

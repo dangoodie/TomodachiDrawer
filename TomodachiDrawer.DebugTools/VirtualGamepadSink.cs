@@ -1,11 +1,10 @@
 ﻿using Nefarius.ViGEm.Client.Targets;
 using Nefarius.ViGEm.Client.Targets.Xbox360;
-using TomodachiDrawer.Core.Interfaces;
-using TomodachiDrawer.DebugTools;
+using TomodachiDrawer.Core.OutputSinks;
 
-namespace TomodachiDrawer.Core.OutputSinks
+namespace TomodachiDrawer.DebugTools
 {
-    public class VirtualGamepadSink : ISwitchOutput
+    public sealed class VirtualGamepadSink : ISwitchOutput
     {
         private readonly IXbox360Controller _gamepad;
 
@@ -13,10 +12,7 @@ namespace TomodachiDrawer.Core.OutputSinks
         {
             if (gamepad.Controller == null || !gamepad.IsConnected)
             {
-                throw new ArgumentException(
-                    "Virtual Gamepad is not connected",
-                    nameof(gamepad)
-                );
+                throw new ArgumentException("Virtual Gamepad is not connected", nameof(gamepad));
             }
 
             _gamepad = gamepad.Controller;
@@ -100,16 +96,22 @@ namespace TomodachiDrawer.Core.OutputSinks
                 value = (byte)(byte.MaxValue - value);
             }
 
-            short xboxValue = value != byte.MaxValue / 2
-                ? (short)((value * (double)(short.MaxValue - short.MinValue) / byte.MaxValue) + short.MinValue)
-                : (short) 0;
+            short xboxValue =
+                value != byte.MaxValue / 2
+                    ? (short)(
+                        (value * (double)(short.MaxValue - short.MinValue) / byte.MaxValue)
+                        + short.MinValue
+                    )
+                    : (short)0;
 
             _gamepad.SetAxisValue(xboxAxis, xboxValue);
         }
 
         public void Dispose() { }
 
-        private static (Xbox360Button? Button, Xbox360Slider? Slider) MapSwitchButton(Button switchButton)
+        private static (Xbox360Button? Button, Xbox360Slider? Slider) MapSwitchButton(
+            Button switchButton
+        )
         {
             return switchButton switch
             {

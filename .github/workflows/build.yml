@@ -236,9 +236,16 @@ jobs:
       run: |
         dotnet publish --configuration ${{ matrix.configuration }} \
           -r ${{ matrix.runtime }} \
-          --self-contained \
-          ${{ !contains(matrix.runtime, 'osx') && '-p:PublishTrimmed=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true' || '-p:BundleMacOSApp=true' }} \
           ${{ github.ref_type == 'tag' && format('-p:Version={0}', github.ref_name) || '' }}
+    - name: Upload debug symbols to Sentry
+      if: github.ref_type == 'tag' && matrix.configuration == 'Release'
+      working-directory: TomodachiDrawer.UI.Avalonia
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      run: |
+        curl -sL https://sentry.io/get-cli/ | bash
+        sentry-cli debug-files upload --org l7y-media --project tomodachidrawer --include-sources \
+          bin/${{ matrix.configuration }}/net10.0/${{ matrix.runtime }}/publish
     - name: Upload Artifacts
       uses: actions/upload-artifact@v7
       with:
