@@ -5,5 +5,3 @@ sdkconfig
 sdkconfig.old
 .cache/
 .vscode/
-tools/_extracted.tdld
-tools/test_*.bin
